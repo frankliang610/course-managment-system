@@ -1,11 +1,13 @@
 import { createServer, Model, Response } from 'miragejs';
+import studentsData from './student.json';
 
 export function makeServer({ environment = 'development' } = {}) {
   let server = createServer({
     environment,
 
     models: {
-      users: Model,
+      user: Model,
+      student: Model,
     },
 
     seeds(server) {
@@ -33,6 +35,7 @@ export function makeServer({ environment = 'development' } = {}) {
         type: 'manager',
         token: '123456+amy',
       });
+      studentsData.forEach((student) => server.create('student', student));
     },
 
     routes() {
@@ -47,6 +50,7 @@ export function makeServer({ environment = 'development' } = {}) {
         return schema.users.all();
       });
 
+      // Log in
       this.post(
         '/login/:type',
         (schema, request) => {
@@ -92,6 +96,15 @@ export function makeServer({ environment = 'development' } = {}) {
         },
         { timing: 1000 }
       );
+
+      // Log out
+      this.post(
+        '/logout',
+        () => new Response(200, {}, { message: 'User Logged Out!' })
+      );
+
+      // Get all students
+      this.get('/students', (schema) => schema.students.all());
     },
   });
 

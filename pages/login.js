@@ -13,7 +13,7 @@ import {
 } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 
-import loginApiCall from './api/login';
+import authApiCall from './api/auth';
 import styles from '../styles/Login.module.css';
 
 const LoginPage = () => {
@@ -23,8 +23,7 @@ const LoginPage = () => {
   const [errorMessage, setErrorMessage] = useState('');
 
   const loginOnClick = async (values) => {
-    console.log('value :>> ', values);
-    const response = await loginApiCall(values, userType);
+    const response = await authApiCall.login(values, userType);
 
     if (response.status === 200) {
       localStorage.setItem('user', JSON.stringify(response.data));
@@ -45,10 +44,10 @@ const LoginPage = () => {
   };
 
   return (
-    <Row justify='center' align='middle' style={{ marginTop: '5%' }}>
+    <Row justify="center" align="middle" style={{ marginTop: '5%' }}>
       <Col span={12}>
         <Form
-          name='normal_login'
+          name="normal_login"
           className={styles.loginForm}
           initialValues={{
             remember: true,
@@ -67,14 +66,14 @@ const LoginPage = () => {
 
           <Form.Item>
             <Radio.Group value={userType} onChange={userTypeOnChange}>
-              <Radio.Button value='student'>Student</Radio.Button>
-              <Radio.Button value='teacher'>Teacher</Radio.Button>
-              <Radio.Button value='manager'>Manger</Radio.Button>
+              <Radio.Button value="student">Student</Radio.Button>
+              <Radio.Button value="teacher">Teacher</Radio.Button>
+              <Radio.Button value="manager">Manger</Radio.Button>
             </Radio.Group>
           </Form.Item>
 
           <Form.Item
-            name='email'
+            name="email"
             rules={[
               {
                 type: 'email',
@@ -87,13 +86,13 @@ const LoginPage = () => {
             ]}
           >
             <Input
-              prefix={<UserOutlined className='site-form-item-icon' />}
-              placeholder='Email'
+              prefix={<UserOutlined className="site-form-item-icon" />}
+              placeholder="Email"
             />
           </Form.Item>
 
           <Form.Item
-            name='password'
+            name="password"
             rules={[
               {
                 required: true,
@@ -107,20 +106,20 @@ const LoginPage = () => {
             ]}
           >
             <Input
-              prefix={<LockOutlined className='site-form-item-icon' />}
-              type='password'
-              placeholder='Password'
+              prefix={<LockOutlined className="site-form-item-icon" />}
+              type="password"
+              placeholder="Password"
             />
           </Form.Item>
 
-          <Form.Item name='remember' valuePropName='checked'>
+          <Form.Item name="remember" valuePropName="checked">
             <Checkbox>Remember me</Checkbox>
           </Form.Item>
 
           <Form.Item>
             <Button
-              type='primary'
-              htmlType='submit'
+              type="primary"
+              htmlType="submit"
               className={styles.loginFormButton}
             >
               Log in
@@ -129,7 +128,7 @@ const LoginPage = () => {
 
           {errorMessage ? (
             <Form.Item>
-              <Alert message={errorMessage} type='error' closable />
+              <Alert message={errorMessage} type="error" closable />
             </Form.Item>
           ) : null}
         </Form>

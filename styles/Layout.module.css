@@ -1,0 +1,31 @@
+.trigger {
+  font-size: 18px;
+  line-height: 64px;
+  padding: 0 24px;
+  cursor: pointer;
+  transition: color 0.3s;
+  color: whitesmoke;
+}
+
+.trigger:hover {
+  color: #b0e5ec;
+}
+
+.logo {
+  height: 32px;
+  line-height: 32px !important;
+  background: rgba(255, 255, 255, 0.3);
+  margin: 18px;
+  color: whitesmoke !important;
+  text-align: center;
+}
+
+.siteLayout .siteLayoutBackground {
+  background: #fff;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  padding: 0;
+}

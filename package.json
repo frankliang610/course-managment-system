@@ -22,6 +22,8 @@
     "styled-components": "^5.2.1"
   },
   "devDependencies": {
-    "miragejs": "^0.1.41"
+    "json-loader": "^0.5.7",
+    "miragejs": "^0.1.41",
+    "prettier": "2.2.0"
   }
 }
