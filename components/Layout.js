@@ -22,13 +22,9 @@ const CustomisedLayout = ({ children }) => {
   const router = useRouter();
 
   const toggle = () => setCollapsed(!collapsed);
-  const onCollapse = (collapsed) => {
-    console.log(collapsed);
-    setCollapsed(collapsed);
-  };
+  const onCollapse = (collapsed) => setCollapsed(collapsed);
 
   const logOutOnClick = () => {
-    console.log('Logout clicked.....');
     localStorage.removeItem('user');
     authApiCall.logout();
     router.push('/login');
@@ -41,10 +37,18 @@ const CustomisedLayout = ({ children }) => {
           {collapsed ? 'C' : 'CMS'}
         </Title>
         <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline">
-          <Menu.Item key="1" icon={<UserOutlined />}>
-            Student List
+          <Menu.Item
+            key="1"
+            icon={<UserOutlined />}
+            onClick={() => console.log('Students List is clicked...')}
+          >
+            Students List
           </Menu.Item>
-          <Menu.Item key="2" icon={<SelectOutlined />}>
+          <Menu.Item
+            key="2"
+            icon={<SelectOutlined />}
+            onClick={() => console.log('Select Student is clicked...')}
+          >
             Select Students
           </Menu.Item>
         </Menu>
