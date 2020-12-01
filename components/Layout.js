@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';
-import Styles from '../styles/Layout.module.css';
-
-import { Layout, Menu, Typography } from 'antd';
+import { Layout, Menu } from 'antd';
 import {
   MenuUnfoldOutlined,
   MenuFoldOutlined,
@@ -11,31 +9,40 @@ import {
   UserOutlined,
 } from '@ant-design/icons';
 
+import {
+  StyledLayout,
+  StyledContentLayout,
+  StyledTitle,
+  StyledContentHeader,
+  StyledContent,
+  StyledBrandIcon,
+  StyledIcon,
+} from '../styles/StyledLayoutComponents';
 import authApiCall from '../pages/api/auth';
 
-const { Header, Content, Footer, Sider } = Layout;
+const { Sider } = Layout;
 
 const CustomisedLayout = ({ children }) => {
-  const { Title } = Typography;
   const [collapsed, setCollapsed] = useState(false);
-
   const router = useRouter();
-
   const toggle = () => setCollapsed(!collapsed);
   const onCollapse = (collapsed) => setCollapsed(collapsed);
-
-  const logOutOnClick = () => {
+  const logOut = () => {
     localStorage.removeItem('user');
     authApiCall.logout();
     router.push('/login');
   };
 
   return (
-    <Layout style={{ minHeight: '100vh' }}>
+    <StyledLayout>
       <Sider collapsible collapsed={collapsed} onCollapse={onCollapse}>
-        <Title level={2} className={Styles.logo}>
-          {collapsed ? 'C' : 'CMS'}
-        </Title>
+        <StyledBrandIcon>
+          {collapsed ? (
+            <StyledTitle level={4}>CMS</StyledTitle>
+          ) : (
+            <StyledTitle level={2}>CMS</StyledTitle>
+          )}
+        </StyledBrandIcon>
         <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline">
           <Menu.Item
             key="1"
@@ -53,24 +60,20 @@ const CustomisedLayout = ({ children }) => {
           </Menu.Item>
         </Menu>
       </Sider>
-      <Layout className={Styles.siteLayout}>
-        <Header className={Styles.header}>
-          {collapsed ? (
-            <MenuUnfoldOutlined className={Styles.trigger} onClick={toggle} />
-          ) : (
-            <MenuFoldOutlined className={Styles.trigger} onClick={toggle} />
-          )}
-          <PoweroffOutlined
-            className={Styles.trigger}
-            onClick={logOutOnClick}
-          />
-        </Header>
-        <Content style={{ margin: '16px' }}>
+      <StyledContentLayout>
+        <StyledContentHeader>
+          <StyledIcon onClick={toggle}>
+            {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+          </StyledIcon>
+          <StyledIcon onClick={logOut}>
+            <PoweroffOutlined />
+          </StyledIcon>
+        </StyledContentHeader>
+        <StyledContent>
           <>{children}</>
-        </Content>
-        <Footer style={{ textAlign: 'center' }}></Footer>
-      </Layout>
-    </Layout>
+        </StyledContent>
+      </StyledContentLayout>
+    </StyledLayout>
   );
 };
 

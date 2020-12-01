@@ -1,28 +1,24 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';
-import {
-  Row,
-  Col,
-  Form,
-  Input,
-  Button,
-  Checkbox,
-  Radio,
-  Alert,
-  Typography,
-} from 'antd';
+import { Col, Form, Input, Checkbox, Radio, Alert } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 
-import authApiCall from './api/auth';
-import styles from '../styles/Login.module.css';
+import {
+  StyledButton,
+  StyledRow,
+  StyledTitle,
+} from '../../styles/StyledLoginComponents';
+import authApiCall from '../api/auth';
+import { Role } from '../../utilities/constant/role';
 
 const LoginPage = () => {
-  const { Title } = Typography;
   const router = useRouter();
   const [userType, setUserType] = useState('student');
   const [errorMessage, setErrorMessage] = useState('');
+  const userTypeOnChange = (e) => setUserType(e.target.value);
+  const resetErrorMessage = () => setErrorMessage('');
 
-  const loginOnClick = async (values) => {
+  const login = async (values) => {
     const response = await authApiCall.login(values, userType);
 
     if (response.status === 200) {
@@ -31,26 +27,21 @@ const LoginPage = () => {
     }
 
     if (response.status === 401) {
-      setErrorMessage('Wrong password, please try again.');
+      setErrorMessage(response.message);
     }
 
     if (response.status === 404) {
-      setErrorMessage('The user does NOT exist, please contact admin.');
+      setErrorMessage(response.message);
     }
   };
 
-  const userTypeOnChange = (e) => {
-    setUserType(e.target.value);
-  };
-
   return (
-    <Row justify="center" align="middle" style={{ marginTop: '5%' }}>
+    <StyledRow justify="center" align="middle">
       <Col span={12}>
         <Form
-          name="normal_login"
-          className={styles.loginForm}
+          name="loginForm"
           initialValues={{
-            remember: true,
+            rememberMe: true,
           }}
           rules={[
             {
@@ -58,17 +49,15 @@ const LoginPage = () => {
               message: 'Please input your name',
             },
           ]}
-          onFinish={loginOnClick}
+          onFinish={login}
         >
-          <Form.Item style={{ textAlign: 'center' }}>
-            <Title level={2}>Course Management Assistant</Title>
-          </Form.Item>
+          <StyledTitle level={2}>Course Management Assistant</StyledTitle>
 
           <Form.Item>
             <Radio.Group value={userType} onChange={userTypeOnChange}>
-              <Radio.Button value="student">Student</Radio.Button>
-              <Radio.Button value="teacher">Teacher</Radio.Button>
-              <Radio.Button value="manager">Manger</Radio.Button>
+              <Radio.Button value={Role.student}>Student</Radio.Button>
+              <Radio.Button value={Role.teacher}>Teacher</Radio.Button>
+              <Radio.Button value={Role.manager}>Manger</Radio.Button>
             </Radio.Group>
           </Form.Item>
 
@@ -85,10 +74,7 @@ const LoginPage = () => {
               },
             ]}
           >
-            <Input
-              prefix={<UserOutlined className="site-form-item-icon" />}
-              placeholder="Email"
-            />
+            <Input prefix={<UserOutlined />} placeholder="Email" />
           </Form.Item>
 
           <Form.Item
@@ -106,34 +92,35 @@ const LoginPage = () => {
             ]}
           >
             <Input
-              prefix={<LockOutlined className="site-form-item-icon" />}
+              prefix={<LockOutlined />}
               type="password"
               placeholder="Password"
             />
           </Form.Item>
 
-          <Form.Item name="remember" valuePropName="checked">
+          <Form.Item name="rememberMe" valuePropName="checked">
             <Checkbox>Remember me</Checkbox>
           </Form.Item>
 
           <Form.Item>
-            <Button
-              type="primary"
-              htmlType="submit"
-              className={styles.loginFormButton}
-            >
+            <StyledButton type="primary" htmlType="submit">
               Log in
-            </Button>
+            </StyledButton>
           </Form.Item>
 
           {errorMessage ? (
             <Form.Item>
-              <Alert message={errorMessage} type="error" closable />
+              <Alert
+                message={errorMessage}
+                type="error"
+                closable
+                afterClose={resetErrorMessage}
+              />
             </Form.Item>
           ) : null}
         </Form>
       </Col>
-    </Row>
+    </StyledRow>
   );
 };
 

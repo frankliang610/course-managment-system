@@ -1,28 +1,38 @@
 import React, { useState, useEffect } from 'react';
-import { Table } from 'antd';
-import Layout from '../components/Layout';
-import getStudentsApiCall from './api/students';
+import { Table, Alert } from 'antd';
+import Layout from '../../components/Layout';
+import {
+  StyledATag,
+  StyledSearchBar,
+} from '../../styles/StyledDashboardComponents';
+import getStudentsApiCall from '../api/students';
 
 const Dashboard = () => {
   const [studentsData, setStudentsData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchBarValue, setSearchBarValue] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+  const resetErrorMessage = () => setErrorMessage('');
 
-  useEffect(() => {
-    getStudentsApiCall().then((res) => {
-      setStudentsData(res.data.students);
+  useEffect(async () => {
+    const response = await getStudentsApiCall();
+
+    if (response.status === 200) {
+      setStudentsData(response.data.students);
       setLoading(false);
-    });
+    }
+
+    if (response.status === 404) {
+      setErrorMessage(response.message);
+      setLoading(false);
+    }
   }, []);
 
-  // Add an unique key prop to each row
-  const cleanupStudentsData = studentsData.map((st) => {
-    return {
-      ...st,
-      key: st.id + st.name,
-    };
-  });
+  // TODO
+  const onSearch = (value) => console.log(value);
+  const searchBarValueOnChange = (e) => setSearchBarValue(e.target.value);
 
-  // Dashboard Table Columns Format
+  //? Dashboard Table Columns Format
   const columns = [
     { title: 'ID', dataIndex: 'id', key: 'id', sorter: (a, b) => a.id - b.id },
     {
@@ -84,29 +94,40 @@ const Dashboard = () => {
       key: 'action',
       render: () => (
         <span>
-          <a
-            style={{ marginRight: 8 }}
-            onClick={() => console.log('Edit Btn Clicked')}
-          >
+          <StyledATag onClick={() => console.log('Edit Btn Clicked')}>
             Edit
-          </a>
-          <a
-            style={{ marginRight: 8 }}
-            onClick={() => console.log('Delete Btn Clicked')}
-          >
+          </StyledATag>
+          <StyledATag onClick={() => console.log('Delete Btn Clicked')}>
             Delete
-          </a>
+          </StyledATag>
         </span>
       ),
     },
   ];
+
   return (
     <Layout>
-      <Table
-        columns={columns}
-        dataSource={cleanupStudentsData}
-        loading={loading}
+      <StyledSearchBar
+        placeholder="Search..."
+        allowClear
+        value={searchBarValue}
+        onChange={searchBarValueOnChange}
+        onSearch={onSearch}
       />
+      <Table
+        rowKey="id"
+        columns={columns}
+        loading={loading}
+        dataSource={studentsData}
+      />
+      {errorMessage ? (
+        <Alert
+          message={errorMessage}
+          type="error"
+          closable
+          afterClose={resetErrorMessage}
+        />
+      ) : null}
     </Layout>
   );
 };
