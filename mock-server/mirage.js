@@ -50,7 +50,7 @@ export function makeServer({ environment = 'development' } = {}) {
         return schema.users.all();
       });
 
-      // Log in
+      //? Log in
       this.post(
         '/login/:type',
         (schema, request) => {
@@ -59,20 +59,21 @@ export function makeServer({ environment = 'development' } = {}) {
           const loggedInUser = schema.users.where(
             (user) => user.email === res.email
           );
-          // Check the email exists or not
+          //? Check the email exists or not
           if (loggedInUser.length < 1) {
             const userNotFound = new Response(
               404,
               {},
               {
-                error: 'The User dose NOT exist!',
+                message:
+                  'The User dose NOT exist! Please contact your Administrator',
               }
             );
 
             return userNotFound;
           } else if (loggedInUser.length === 1) {
             const userFound = loggedInUser.models[0].attrs;
-            // Check the password matches or not
+            //? Check the password matches or not
             if (userFound.password === res.password) {
               const { token, type } = userFound;
 
@@ -84,7 +85,7 @@ export function makeServer({ environment = 'development' } = {}) {
                 401,
                 {},
                 {
-                  error: 'Unauthorized!',
+                  message: 'Wrong password, please try again!',
                 }
               );
 
@@ -97,14 +98,27 @@ export function makeServer({ environment = 'development' } = {}) {
         { timing: 1000 }
       );
 
-      // Log out
+      //? Log out
       this.post(
         '/logout',
         () => new Response(200, {}, { message: 'User Logged Out!' })
       );
 
-      // Get all students
-      this.get('/students', (schema) => schema.students.all());
+      //? Get all students
+      this.get('/students', (schema) => {
+        if (schema.students) {
+          return schema.students.all();
+        } else {
+          const NotStudentsData = new Response(
+            404,
+            {},
+            {
+              message: 'The students data dose NOT exist!!',
+            }
+          );
+          return NotStudentsData;
+        }
+      });
     },
   });
 
