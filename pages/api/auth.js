@@ -1,31 +1,19 @@
-import axios from 'axios';
-import { API_URL } from './apiUrl';
-import formattedError from './formattedError';
+import axiosClient from './baseAxiosClient';
+import { rootPaths } from './apiPathsGenerator';
 
-const login = async (data, userType) => {
-  const loginUrl = `${API_URL}/login/${userType}`;
-
-  const loginResponse = await axios
-    .post(loginUrl, {
+const login = async (data, userRole) => {
+  console.log('axiosClient :>> ', axiosClient);
+  return await axiosClient.postRequest(
+    rootPaths.login,
+    {
       email: data.email,
       password: data.password,
-    })
-    .then((response) => response)
-    .catch((error) => formattedError(error.response));
-  //? The error handling response was designed by axios like so: 'error.response'.
-  //? Details can be found here: https://github.com/axios/axios/issues/376
-  return loginResponse;
+    },
+    userRole
+  );
 };
 
-const logout = async () => {
-  const logoutUrl = `${API_URL}/logout`;
-
-  const logoutResponse = await axios
-    .post(logoutUrl, {})
-    .then((response) => response)
-    .catch((error) => formattedError(error.response));
-
-  return logoutResponse;
-};
+const logout = async () =>
+  await axiosClient.postRequest(rootPaths.logout, null);
 
 export default { login, logout };
