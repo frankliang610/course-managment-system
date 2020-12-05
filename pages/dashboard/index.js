@@ -1,14 +1,20 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { debounce } from 'lodash';
 import { Table, Alert } from 'antd';
 import Layout from '../../components/Layout';
 import {
   StyledATag,
   StyledSearchBar,
 } from '../../styles/StyledDashboardComponents';
-import getStudentsApiCall from '../api/students';
+import getStudentsRequest from '../api/students';
 
 const Dashboard = () => {
   const [studentsData, setStudentsData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [isSearching, setSearching] = useState(false);
+  const [searchBarInputValue, setSearchBarInputValue] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+  //? Initialize Pagination Object
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 10,
@@ -16,18 +22,17 @@ const Dashboard = () => {
     showSizeChanger: true,
     total: 10,
   });
+  //? Initialize Query Parameters Object
   const [queryParams, setQueryParams] = useState({
-    query: '',
     limit: 10,
     page: 1,
   });
-  const [loading, setLoading] = useState(true);
-  const [searchBarValue, setSearchBarValue] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
+
   const resetErrorMessage = () => setErrorMessage('');
 
+  //? Fetch/Refetch/Query Students Data from Db
   useEffect(async () => {
-    const response = await getStudentsApiCall(queryParams);
+    const response = await getStudentsRequest(queryParams);
 
     if (response.status === 200) {
       const { total } = response.data.data.paganitor;
@@ -37,6 +42,7 @@ const Dashboard = () => {
         total,
       });
       setLoading(false);
+      setSearching(false);
     }
 
     if (response.status === 404) {
@@ -45,13 +51,30 @@ const Dashboard = () => {
     }
   }, [queryParams]);
 
-  // TODO
-  const onSearch = async (value) => {
-    console.log(value);
+  const searchQuery = (queryTerm) => {
+    setSearching(true);
+    setQueryParams({
+      ...queryParams,
+      query: queryTerm,
+    });
   };
-  const searchBarValueOnChange = (e) => setSearchBarValue(e.target.value);
 
-  const tableOnChange = (pagination, filters, sorter, extra) => {
+  //? Delay setQueryParams -> delay refetch students from Db
+  const debouncedSearchQuery = useCallback(debounce(searchQuery, 550), []);
+
+  //? Enter keystroke/Click the search icon triggers onSearch function
+  const onSearch = (queryTerm) => {
+    searchQuery(queryTerm);
+  };
+
+  const searchBarOnChange = (e) => {
+    const { value } = e.target;
+
+    setSearchBarInputValue(value);
+    debouncedSearchQuery(value);
+  };
+
+  const tableOnChange = (pagination) => {
     setPagination({
       ...pagination,
       current: pagination.current,
@@ -63,6 +86,7 @@ const Dashboard = () => {
       page: pagination.current,
     });
   };
+
   //? Dashboard Table Columns Format
   const columns = [
     { title: 'ID', dataIndex: 'id', key: 'id', sorter: (a, b) => a.id - b.id },
@@ -141,9 +165,10 @@ const Dashboard = () => {
       <StyledSearchBar
         placeholder="Search..."
         allowClear
-        value={searchBarValue}
-        onChange={searchBarValueOnChange}
+        value={searchBarInputValue}
+        onChange={searchBarOnChange}
         onSearch={onSearch}
+        loading={isSearching}
       />
       <Table
         rowKey="id"

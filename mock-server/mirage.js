@@ -44,7 +44,7 @@ export function makeServer({ environment = 'development' } = {}) {
               404,
               {},
               {
-                message:
+                msg:
                   'The User dose NOT exist! Please contact your Administrator',
               }
             );
@@ -64,7 +64,7 @@ export function makeServer({ environment = 'development' } = {}) {
                 401,
                 {},
                 {
-                  message: 'Wrong password, please try again!',
+                  msg: 'Wrong password, please try again!',
                 }
               );
 
@@ -78,29 +78,38 @@ export function makeServer({ environment = 'development' } = {}) {
       );
 
       //? Log out
-      this.post(
-        '/logout',
-        () => new Response(200, {}, { message: 'User Logged Out!' })
-      );
+      this.post('/logout', (schema, request) => {
+        //* Some logic here before logging out:
+        //* i.e. delete the user token
+        return new Response(200, {}, { msg: 'the user logged out!' });
+      });
 
       //? Get all students
       this.get('/students', (schema, request) => {
         const { queryParams } = request;
         const { db } = schema;
-        const paginatedData = db.students.slice(startIndex, endIndex);
 
+        //? Search Query
+        const query = queryParams.query || '';
+        const queriedData = db.students.where((student) =>
+          student.name.includes(query)
+        );
+
+        //? Pagination
         const page = parseInt(queryParams.page, 10) || 1;
         const limit = parseInt(queryParams.limit, 10) || 10;
         const startIndex = (page - 1) * limit;
         const endIndex = page * limit;
         const total = schema.db.students.length;
+        const paginatedData = db.students.slice(startIndex, endIndex);
         const paganitor = {
           limit,
           page,
-          total,
+          total: query ? queriedData.length : total,
         };
 
-        if (schema.students && !!queryParams) {
+        //? Pagination Response
+        if (!query && schema.students) {
           const successResponse = new Response(
             200,
             {},
@@ -115,6 +124,23 @@ export function makeServer({ environment = 'development' } = {}) {
             }
           );
           return successResponse;
+          //? Search Query Response
+        } else if (query && schema.students) {
+          const successResponse = new Response(
+            200,
+            {},
+            {
+              code: 0,
+              msg: 'success',
+              data: {
+                students: queriedData,
+                total: limit,
+                paganitor,
+              },
+            }
+          );
+          return successResponse;
+          //? Pagination & Search Query failure
         } else {
           const NotStudentsData = new Response(
             404,
