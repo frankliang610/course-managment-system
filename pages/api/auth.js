@@ -2,7 +2,6 @@ import axiosClient from './baseAxiosClient';
 import { rootPaths } from './apiPathsGenerator';
 
 const login = async (data, userRole) => {
-  console.log('axiosClient :>> ', axiosClient);
   return await axiosClient.postRequest(
     rootPaths.login,
     {
@@ -13,7 +12,6 @@ const login = async (data, userRole) => {
   );
 };
 
-const logout = async () =>
-  await axiosClient.postRequest(rootPaths.logout, null);
+const logout = async () => await axiosClient.postRequest(rootPaths.logout);
 
 export default { login, logout };

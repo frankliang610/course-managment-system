@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';
-import { Layout, Menu } from 'antd';
+import { Layout, Menu, message } from 'antd';
 import {
   MenuUnfoldOutlined,
   MenuFoldOutlined,
@@ -27,10 +27,14 @@ const CustomisedLayout = ({ children }) => {
   const router = useRouter();
   const toggle = () => setCollapsed(!collapsed);
   const onCollapse = (collapsed) => setCollapsed(collapsed);
-  const logOut = () => {
-    localStorage.removeItem('user');
-    authApiCall.logout();
-    router.push('/login');
+  const logOut = async () => {
+    const response = await authApiCall.logout();
+    if (response.status === 200) {
+      localStorage.removeItem('user');
+      router.push('/');
+    } else {
+      message.error('Something went wrong, please contact the Administrator!');
+    }
   };
 
   return (

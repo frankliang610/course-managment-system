@@ -7,7 +7,7 @@ const axiosClient = axios.create({
   baseURL: 'http://localhost:3000/api',
   responseType: 'json',
 });
-
+//* GET Method
 const getRequest = async (path, params = null) => {
   const url = apiPathsGenerator(path, params);
   const res = await axiosClient
@@ -17,7 +17,8 @@ const getRequest = async (path, params = null) => {
   //? Details can be found here: https://github.com/axios/axios/issues/376
   return res;
 };
-const postRequest = async (path, data, params = null) => {
+//* POST Method
+const postRequest = async (path, data = null, params = null) => {
   const url = apiPathsGenerator(path, params);
   const res = await axiosClient
     .post(url, data)
