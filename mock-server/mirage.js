@@ -1,5 +1,7 @@
 import { createServer, Model, Response } from 'miragejs';
-import studentsData from './student.json';
+import jwt from 'jsonwebtoken';
+import studentsData from './students.json';
+import usersData from './users.json';
 
 export function makeServer({ environment = 'development' } = {}) {
   let server = createServer({
@@ -11,30 +13,7 @@ export function makeServer({ environment = 'development' } = {}) {
     },
 
     seeds(server) {
-      server.create('user', {
-        id: 1,
-        name: 'Jack',
-        email: 'jack@email.com',
-        password: '123456',
-        type: 'student',
-        token: '123456+jack',
-      });
-      server.create('user', {
-        id: 2,
-        name: 'Tom',
-        email: 'tom@email.com',
-        password: '123456',
-        type: 'teacher',
-        token: '123456+tom',
-      });
-      server.create('user', {
-        id: 3,
-        name: 'Amy',
-        email: 'amy@email.com',
-        password: '123456',
-        type: 'manager',
-        token: '123456+amy',
-      });
+      usersData.forEach((user) => server.create('user', user));
       studentsData.forEach((student) => server.create('student', student));
     },
 
@@ -75,8 +54,8 @@ export function makeServer({ environment = 'development' } = {}) {
             const userFound = loggedInUser.models[0].attrs;
             //? Check the password matches or not
             if (userFound.password === res.password) {
-              const { token, type } = userFound;
-
+              const { type } = userFound;
+              const token = jwt.sign({}, res.password);
               const newResponse = new Response(200, {}, { token, type });
 
               return newResponse;
@@ -105,15 +84,43 @@ export function makeServer({ environment = 'development' } = {}) {
       );
 
       //? Get all students
-      this.get('/students', (schema) => {
-        if (schema.students) {
-          return schema.students.all();
+      this.get('/students', (schema, request) => {
+        const { queryParams } = request;
+        const { db } = schema;
+        const paginatedData = db.students.slice(startIndex, endIndex);
+
+        const page = parseInt(queryParams.page, 10) || 1;
+        const limit = parseInt(queryParams.limit, 10) || 10;
+        const startIndex = (page - 1) * limit;
+        const endIndex = page * limit;
+        const total = schema.db.students.length;
+        const paganitor = {
+          limit,
+          page,
+          total,
+        };
+
+        if (schema.students && !!queryParams) {
+          const successResponse = new Response(
+            200,
+            {},
+            {
+              code: 0,
+              msg: 'success',
+              data: {
+                students: paginatedData,
+                total: limit,
+                paganitor,
+              },
+            }
+          );
+          return successResponse;
         } else {
           const NotStudentsData = new Response(
             404,
             {},
             {
-              message: 'The students data dose NOT exist!!',
+              msg: 'fail',
             }
           );
           return NotStudentsData;

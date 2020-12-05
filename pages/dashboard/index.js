@@ -9,29 +9,60 @@ import getStudentsApiCall from '../api/students';
 
 const Dashboard = () => {
   const [studentsData, setStudentsData] = useState([]);
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pageSize: 10,
+    pageSizeOptions: [10, 20, 50, 100],
+    showSizeChanger: true,
+    total: 10,
+  });
+  const [queryParams, setQueryParams] = useState({
+    query: '',
+    limit: 10,
+    page: 1,
+  });
   const [loading, setLoading] = useState(true);
   const [searchBarValue, setSearchBarValue] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const resetErrorMessage = () => setErrorMessage('');
 
   useEffect(async () => {
-    const response = await getStudentsApiCall();
+    const response = await getStudentsApiCall(queryParams);
 
     if (response.status === 200) {
-      setStudentsData(response.data.students);
+      const { total } = response.data.data.paganitor;
+      setStudentsData(response.data.data.students);
+      setPagination({
+        ...pagination,
+        total,
+      });
       setLoading(false);
     }
 
     if (response.status === 404) {
-      setErrorMessage(response.message);
+      setErrorMessage(response.data.msg);
       setLoading(false);
     }
-  }, []);
+  }, [queryParams]);
 
   // TODO
-  const onSearch = (value) => console.log(value);
+  const onSearch = async (value) => {
+    console.log(value);
+  };
   const searchBarValueOnChange = (e) => setSearchBarValue(e.target.value);
 
+  const tableOnChange = (pagination, filters, sorter, extra) => {
+    setPagination({
+      ...pagination,
+      current: pagination.current,
+      pageSize: pagination.pageSize,
+    });
+    setQueryParams({
+      ...queryParams,
+      limit: pagination.pageSize,
+      page: pagination.current,
+    });
+  };
   //? Dashboard Table Columns Format
   const columns = [
     { title: 'ID', dataIndex: 'id', key: 'id', sorter: (a, b) => a.id - b.id },
@@ -119,6 +150,8 @@ const Dashboard = () => {
         columns={columns}
         loading={loading}
         dataSource={studentsData}
+        pagination={pagination}
+        onChange={tableOnChange}
       />
       {errorMessage ? (
         <Alert
