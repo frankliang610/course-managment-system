@@ -28,7 +28,19 @@ const postRequest = async (path, data = null, params = null) => {
   return res;
 };
 
+//* DELETE Method
+const deleteRequest = async (path, params = null) => {
+  const url = apiPathsGenerator(path, params);
+  const res = await axiosClient
+    .delete(url)
+    .then((res) => res)
+    .catch((err) => formattedError(err.response));
+
+  return res;
+};
+
 export default {
   getRequest,
   postRequest,
+  deleteRequest,
 };

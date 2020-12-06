@@ -6,7 +6,9 @@ export const rootPaths = {
 };
 
 export const subPaths = {
-  details: 'details',
+  add: 'add',
+  edit: 'edit',
+  delete: 'delete',
 };
 
 export const apiPathsGenerator = (paths, params) => {
@@ -26,5 +28,6 @@ export const apiPathsGenerator = (paths, params) => {
   } else {
     generatedApiPath = paths;
   }
+
   return generatedApiPath;
 };
