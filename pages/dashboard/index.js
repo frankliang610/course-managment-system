@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { debounce } from 'lodash';
-import { Table, Alert } from 'antd';
+import { Table, Alert, Popconfirm, message } from 'antd';
 import Layout from '../../components/Layout';
 import {
   StyledATag,
   StyledSearchBar,
 } from '../../styles/StyledDashboardComponents';
-import getStudentsRequest from '../api/students';
+import studentsApiCall from '../api/students';
 
 const Dashboard = () => {
   const [studentsData, setStudentsData] = useState([]);
@@ -32,7 +32,7 @@ const Dashboard = () => {
 
   //? Fetch/Refetch/Query Students Data from Db
   useEffect(async () => {
-    const response = await getStudentsRequest(queryParams);
+    const response = await studentsApiCall.getStudents(queryParams);
 
     if (response.status === 200) {
       const { total } = response.data.data.paganitor;
@@ -49,7 +49,7 @@ const Dashboard = () => {
       setErrorMessage(response.data.msg);
       setLoading(false);
     }
-  }, [queryParams]);
+  }, [queryParams, setStudentsData]);
 
   const searchQuery = (queryTerm) => {
     setSearching(true);
@@ -85,6 +85,22 @@ const Dashboard = () => {
       limit: pagination.pageSize,
       page: pagination.current,
     });
+  };
+
+  //? Delete student action
+  const deleteStudent = async (data) => {
+    const { id, name } = data;
+    const response = await studentsApiCall.deleteStudent({ id });
+    if (response.status === 200) {
+      const afterRemoveTargetStudent = studentsData.filter(
+        (student) => student.id !== id
+      );
+      setStudentsData(afterRemoveTargetStudent);
+      tableOnChange(pagination);
+      message.info(`Student ${name} has been deleted!`);
+    } else {
+      message.error(response.message);
+    }
   };
 
   //? Dashboard Table Columns Format
@@ -147,14 +163,21 @@ const Dashboard = () => {
       title: 'Action',
       dataIndex: 'action',
       key: 'action',
-      render: () => (
+      render: (_, record) => (
         <span>
           <StyledATag onClick={() => console.log('Edit Btn Clicked')}>
             Edit
           </StyledATag>
-          <StyledATag onClick={() => console.log('Delete Btn Clicked')}>
-            Delete
-          </StyledATag>
+          <span className="ant-divider" />
+          <Popconfirm
+            placement="leftBottom"
+            title={`Are you sure to delete student ${record.name}? `}
+            okText="Delete"
+            cancelText="Cancel"
+            onConfirm={() => deleteStudent(record)}
+          >
+            <StyledATag>Delete</StyledATag>
+          </Popconfirm>
         </span>
       ),
     },
