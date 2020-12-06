@@ -1,9 +1,12 @@
 import { createServer, Model, Response } from 'miragejs';
 import jwt from 'jsonwebtoken';
-import studentsData from './students.json';
-import usersData from './users.json';
+import students from './students.json';
+import users from './users.json';
 
 export function makeServer({ environment = 'development' } = {}) {
+  const studentsData = [...students];
+  const usersData = [...users];
+
   let server = createServer({
     environment,
 
@@ -29,7 +32,7 @@ export function makeServer({ environment = 'development' } = {}) {
         return schema.users.all();
       });
 
-      //? Log in
+      //? Auth: Log in
       this.post(
         '/login/:type',
         (schema, request) => {
@@ -77,17 +80,17 @@ export function makeServer({ environment = 'development' } = {}) {
         { timing: 1000 }
       );
 
-      //? Log out
+      //? Auth: Log out
       this.post('/logout', (schema, request) => {
-        //* Some logic here before logging out:
+        //* Some logic has to be done here before logging out:
         //* i.e. delete the user token
         return new Response(200, {}, { msg: 'the user logged out!' });
       });
 
-      //? Get all students
+      //? Students List: Get all students
       this.get('/students', (schema, request) => {
-        const { queryParams } = request;
         const { db } = schema;
+        const { queryParams } = request;
 
         //? Search Query
         const query = queryParams.query || '';
@@ -150,6 +153,41 @@ export function makeServer({ environment = 'development' } = {}) {
             }
           );
           return NotStudentsData;
+        }
+      });
+
+      //? Students List: Add a new student
+      this.post('/students/add', (schema, request) => {});
+
+      //? Students List: Edit an existing student
+      this.post('/students/update', (schema, request) => {});
+
+      //? Students List: Delete an existing student
+      this.del('/students/delete', (schema, request) => {
+        const { db } = schema;
+        const { id } = request.queryParams;
+        const targetStudent = schema.students.where({ id });
+        if (targetStudent.length) {
+          targetStudent.destroy();
+          return new Response(
+            200,
+            {},
+            {
+              code: 0,
+              msg: 'success',
+              data: true,
+            }
+          );
+        } else {
+          return new Response(
+            404,
+            {},
+            {
+              code: 0,
+              msg: 'delete student dose NOT exist',
+              data: false,
+            }
+          );
         }
       });
     },
