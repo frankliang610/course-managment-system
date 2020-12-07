@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { debounce } from 'lodash';
-import { Table, Alert, Popconfirm, message } from 'antd';
+import { Table, Popconfirm, message } from 'antd';
 import Layout from '../../components/Layout';
 import {
   StyledATag,
@@ -13,7 +13,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [isSearching, setSearching] = useState(false);
   const [searchBarInputValue, setSearchBarInputValue] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
+
   //? Initialize Pagination Object
   const [pagination, setPagination] = useState({
     current: 1,
@@ -28,26 +28,19 @@ const Dashboard = () => {
     page: 1,
   });
 
-  const resetErrorMessage = () => setErrorMessage('');
-
   //? Fetch/Refetch/Query Students Data from Db
   useEffect(async () => {
     const response = await studentsApiCall.getStudents(queryParams);
+    const { students, total } = response.data;
 
-    if (response.status === 200) {
-      const { total } = response.data.data.paganitor;
-      setStudentsData(response.data.data.students);
+    if (students) {
+      setStudentsData(students);
       setPagination({
         ...pagination,
         total,
       });
       setLoading(false);
       setSearching(false);
-    }
-
-    if (response.status === 404) {
-      setErrorMessage(response.data.msg);
-      setLoading(false);
     }
   }, [queryParams, setStudentsData]);
 
@@ -89,17 +82,15 @@ const Dashboard = () => {
 
   //? Delete student action
   const deleteStudent = async (data) => {
-    const { id, name } = data;
+    const { id } = data;
     const response = await studentsApiCall.deleteStudent({ id });
-    if (response.status === 200) {
+
+    if (response.data) {
       const afterRemoveTargetStudent = studentsData.filter(
         (student) => student.id !== id
       );
       setStudentsData(afterRemoveTargetStudent);
       tableOnChange(pagination);
-      message.info(`Student ${name} has been deleted!`);
-    } else {
-      message.error(response.message);
     }
   };
 
@@ -201,14 +192,6 @@ const Dashboard = () => {
         pagination={pagination}
         onChange={tableOnChange}
       />
-      {errorMessage ? (
-        <Alert
-          message={errorMessage}
-          type="error"
-          closable
-          afterClose={resetErrorMessage}
-        />
-      ) : null}
     </Layout>
   );
 };

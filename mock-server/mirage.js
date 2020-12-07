@@ -1,5 +1,4 @@
 import { createServer, Model, Response } from 'miragejs';
-import jwt from 'jsonwebtoken';
 import students from './students.json';
 import users from './users.json';
 
@@ -28,75 +27,64 @@ export function makeServer({ environment = 'development' } = {}) {
 
       this.namespace = '/api';
 
-      this.get('/users', (schema) => {
-        return schema.users.all();
-      });
-
       //? Auth: Log in
-      this.post(
-        '/login/:type',
-        (schema, request) => {
-          const res = JSON.parse(request.requestBody);
+      this.post('/login', (schema, request) => {
+        const req = JSON.parse(request.requestBody);
+        const { userRole } = request.queryParams;
 
-          const loggedInUser = schema.users.where(
-            (user) => user.email === res.email
-          );
-          //? Check the email exists or not
-          if (loggedInUser.length < 1) {
-            const userNotFound = new Response(
-              404,
-              {},
-              {
-                msg:
-                  'The User dose NOT exist! Please contact your Administrator',
-              }
-            );
+        const user = schema.users.where({
+          email: req.email,
+          password: req.password,
+          type: userRole,
+        });
 
-            return userNotFound;
-          } else if (loggedInUser.length === 1) {
-            const userFound = loggedInUser.models[0].attrs;
-            //? Check the password matches or not
-            if (userFound.password === res.password) {
-              const { type } = userFound;
-              const token = jwt.sign({}, res.password);
-              const newResponse = new Response(200, {}, { token, type });
-
-              return newResponse;
-            } else {
-              const passwordNotMatch = new Response(
-                401,
-                {},
-                {
-                  msg: 'Wrong password, please try again!',
-                }
-              );
-
-              return passwordNotMatch;
+        if (user.length) {
+          const token = Math.random().toString(32).split('.')[1];
+          const successResponse = new Response(
+            200,
+            {},
+            {
+              code: 200,
+              msg: 'login successfully',
+              data: {
+                token,
+                loginType: userRole,
+              },
             }
-          } else {
-            throw new Error('This should not happen');
-          }
-        },
-        { timing: 1000 }
-      );
+          );
+
+          return successResponse;
+        } else {
+          return new Response(
+            403,
+            {},
+            {
+              code: 400,
+              msg: 'Wrong email or password, please try again!',
+            }
+          );
+        }
+      });
 
       //? Auth: Log out
       this.post('/logout', (schema, request) => {
         //* Some logic has to be done here before logging out:
         //* i.e. delete the user token
-        return new Response(200, {}, { msg: 'the user logged out!' });
+        return new Response(
+          200,
+          {},
+          {
+            code: 200,
+            msg: 'logout successfully',
+            data: true,
+          }
+        );
       });
 
       //? Students List: Get all students
       this.get('/students', (schema, request) => {
         const { db } = schema;
         const { queryParams } = request;
-
-        //? Search Query
-        const query = queryParams.query || '';
-        const queriedData = db.students.where((student) =>
-          student.name.includes(query)
-        );
 
         //? Pagination
         const page = parseInt(queryParams.page, 10) || 1;
@@ -105,54 +93,45 @@ export function makeServer({ environment = 'development' } = {}) {
         const endIndex = page * limit;
         const total = schema.db.students.length;
         const paginatedData = db.students.slice(startIndex, endIndex);
-        const paganitor = {
+        const paginator = {
           limit,
           page,
           total: query ? queriedData.length : total,
         };
 
-        //? Pagination Response
-        if (!query && schema.students) {
+        //? Search Query
+        const query = queryParams.query || '';
+        const queriedData = db.students.where((student) =>
+          student.name.includes(query)
+        );
+
+        //? Pagination & Search Query Response
+        if (schema.students) {
           const successResponse = new Response(
             200,
             {},
             {
-              code: 0,
+              code: 200,
               msg: 'success',
               data: {
-                students: paginatedData,
+                students: query ? queriedData : paginatedData,
                 total: limit,
-                paganitor,
+                paginator,
               },
             }
           );
           return successResponse;
-          //? Search Query Response
-        } else if (query && schema.students) {
-          const successResponse = new Response(
-            200,
-            {},
-            {
-              code: 0,
-              msg: 'success',
-              data: {
-                students: queriedData,
-                total: limit,
-                paganitor,
-              },
-            }
-          );
-          return successResponse;
-          //? Pagination & Search Query failure
         } else {
-          const NotStudentsData = new Response(
+          //? Pagination & Search Query failure
+          const failedResponse = new Response(
             404,
             {},
             {
-              msg: 'fail',
+              code: 400,
+              msg: 'Data query failed',
             }
           );
-          return NotStudentsData;
+          return failedResponse;
         }
       });
 
@@ -164,7 +143,6 @@ export function makeServer({ environment = 'development' } = {}) {
 
       //? Students List: Delete an existing student
       this.del('/students/delete', (schema, request) => {
-        const { db } = schema;
         const { id } = request.queryParams;
         const targetStudent = schema.students.where({ id });
         if (targetStudent.length) {
@@ -173,7 +151,7 @@ export function makeServer({ environment = 'development' } = {}) {
             200,
             {},
             {
-              code: 0,
+              code: 200,
               msg: 'success',
               data: true,
             }
@@ -183,8 +161,8 @@ export function makeServer({ environment = 'development' } = {}) {
             404,
             {},
             {
-              code: 0,
-              msg: 'delete student dose NOT exist',
+              code: 400,
+              msg: 'delete failed',
               data: false,
             }
           );

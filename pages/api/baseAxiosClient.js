@@ -1,42 +1,46 @@
 import axios from 'axios';
 import { apiPathsGenerator } from './apiPathsGenerator';
-import formattedError from './formattedError';
+import formattedResponse from './formattedResponse';
+
+const { formattedError, showResponseMessage } = formattedResponse;
 
 const axiosClient = axios.create({
   withCredentials: true,
   baseURL: 'http://localhost:3000/api',
   responseType: 'json',
 });
+
 //* GET Method
 const getRequest = async (path, params = null) => {
   const url = apiPathsGenerator(path, params);
-  const res = await axiosClient
+  const response = await axiosClient
     .get(url)
-    .then((res) => res)
-    .catch((err) => formattedError(err.response)); //? The error handling response was designed by axios like so: 'error.response'.
-  //? Details can be found here: https://github.com/axios/axios/issues/376
-  return res;
+    .then((res) => res.data)
+    .catch((err) => formattedError(err.response));
+
+  return response;
 };
+
 //* POST Method
 const postRequest = async (path, data = null, params = null) => {
   const url = apiPathsGenerator(path, params);
-  const res = await axiosClient
+  const response = await axiosClient
     .post(url, data)
-    .then((res) => res)
+    .then((res) => showResponseMessage(res.data))
     .catch((err) => formattedError(err.response));
 
-  return res;
+  return response;
 };
 
 //* DELETE Method
 const deleteRequest = async (path, params = null) => {
   const url = apiPathsGenerator(path, params);
-  const res = await axiosClient
+  const response = await axiosClient
     .delete(url)
-    .then((res) => res)
+    .then((res) => showResponseMessage(res.data))
     .catch((err) => formattedError(err.response));
 
-  return res;
+  return response;
 };
 
 export default {

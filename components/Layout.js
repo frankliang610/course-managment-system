@@ -29,11 +29,9 @@ const CustomisedLayout = ({ children }) => {
   const onCollapse = (collapsed) => setCollapsed(collapsed);
   const logOut = async () => {
     const response = await authApiCall.logout();
-    if (response.status === 200) {
+    if (response.data) {
       localStorage.removeItem('user');
-      router.push('/');
-    } else {
-      message.error('Something went wrong, please contact the Administrator!');
+      router.push('/login');
     }
   };
 
