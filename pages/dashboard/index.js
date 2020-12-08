@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { debounce } from 'lodash';
-import { Table, Popconfirm, message } from 'antd';
+import { Table, Popconfirm } from 'antd';
 import Layout from '../../components/Layout';
 import {
   StyledATag,
@@ -12,7 +12,6 @@ const Dashboard = () => {
   const [studentsData, setStudentsData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isSearching, setSearching] = useState(false);
-  const [searchBarInputValue, setSearchBarInputValue] = useState('');
 
   //? Initialize Pagination Object
   const [pagination, setPagination] = useState({
@@ -31,13 +30,14 @@ const Dashboard = () => {
   //? Fetch/Refetch/Query Students Data from Db
   useEffect(async () => {
     const response = await studentsApiCall.getStudents(queryParams);
-    const { students, total } = response.data;
+    const { students, paginator } = response.data;
 
     if (students) {
       setStudentsData(students);
       setPagination({
         ...pagination,
-        total,
+        current: paginator.page, //* fixed the bug search didn't work on the 2nd page.
+        total: paginator.total,
       });
       setLoading(false);
       setSearching(false);
@@ -62,8 +62,6 @@ const Dashboard = () => {
 
   const searchBarOnChange = (e) => {
     const { value } = e.target;
-
-    setSearchBarInputValue(value);
     debouncedSearchQuery(value);
   };
 
@@ -96,7 +94,12 @@ const Dashboard = () => {
 
   //? Dashboard Table Columns Format
   const columns = [
-    { title: 'ID', dataIndex: 'id', key: 'id', sorter: (a, b) => a.id - b.id },
+    {
+      title: 'No.',
+      dataIndex: 'index',
+      key: 'index',
+      render: (text, record, index) => index + 1,
+    },
     {
       title: 'Name',
       dataIndex: 'name',
@@ -179,7 +182,7 @@ const Dashboard = () => {
       <StyledSearchBar
         placeholder="Search..."
         allowClear
-        value={searchBarInputValue}
+        // value={searchBarInputValue}
         onChange={searchBarOnChange}
         onSearch={onSearch}
         loading={isSearching}

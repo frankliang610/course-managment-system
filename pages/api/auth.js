@@ -1,15 +1,17 @@
 import axiosClient from './baseAxiosClient';
 import { rootPaths } from './apiPathsGenerator';
+import formattedResponse from './formattedResponse';
 
-const login = async (data, userRole) =>
-  await axiosClient.postRequest(
-    rootPaths.login,
-    {
+const { showResponseMessage } = formattedResponse;
+
+const login = async (data) =>
+  await axiosClient
+    .getRequest(rootPaths.login, {
+      loginType: data.userRole,
       email: data.email,
       password: data.password,
-    },
-    userRole
-  );
+    })
+    .then((res) => showResponseMessage(res));
 
 const logout = async () => await axiosClient.postRequest(rootPaths.logout);
 

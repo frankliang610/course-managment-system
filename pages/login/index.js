@@ -17,7 +17,7 @@ const LoginPage = () => {
   const userRoleOnChange = (e) => setUserRole(e.target.value);
 
   const login = async (values) => {
-    const response = await authApiCall.login(values, { userRole });
+    const response = await authApiCall.login({ ...values, userRole });
     if (response.data) {
       localStorage.setItem('user', JSON.stringify(response.data));
       router.push('/dashboard');

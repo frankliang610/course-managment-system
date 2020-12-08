@@ -1,11 +1,8 @@
 import { createServer, Model, Response } from 'miragejs';
-import students from './students.json';
-import users from './users.json';
+import studentsData from './students.json';
+import usersData from './users.json';
 
 export function makeServer({ environment = 'development' } = {}) {
-  const studentsData = [...students];
-  const usersData = [...users];
-
   let server = createServer({
     environment,
 
@@ -28,14 +25,13 @@ export function makeServer({ environment = 'development' } = {}) {
       this.namespace = '/api';
 
       //? Auth: Log in
-      this.post('/login', (schema, request) => {
-        const req = JSON.parse(request.requestBody);
-        const { userRole } = request.queryParams;
+      this.get('/login', (schema, request) => {
+        const { loginType, email, password } = request.queryParams;
 
         const user = schema.users.where({
-          email: req.email,
-          password: req.password,
-          type: userRole,
+          email,
+          password,
+          type: loginType,
         });
 
         if (user.length) {
@@ -48,7 +44,7 @@ export function makeServer({ environment = 'development' } = {}) {
               msg: 'login successfully',
               data: {
                 token,
-                loginType: userRole,
+                loginType,
               },
             }
           );
@@ -85,25 +81,28 @@ export function makeServer({ environment = 'development' } = {}) {
       this.get('/students', (schema, request) => {
         const { db } = schema;
         const { queryParams } = request;
+        const studentsDataFromDb = db.students;
+
+        //? Search Query
+        const query = queryParams.query || '';
+        const queriedData = studentsDataFromDb.filter((student) =>
+          student.name.includes(query)
+        );
 
         //? Pagination
         const page = parseInt(queryParams.page, 10) || 1;
         const limit = parseInt(queryParams.limit, 10) || 10;
         const startIndex = (page - 1) * limit;
         const endIndex = page * limit;
-        const total = schema.db.students.length;
-        const paginatedData = db.students.slice(startIndex, endIndex);
+        const total = studentsDataFromDb.length;
+        const paginatedData = studentsDataFromDb.slice(startIndex, endIndex);
+        const responseStudentsData = query ? queriedData : paginatedData;
+
         const paginator = {
           limit,
-          page,
+          page: query ? 1 : page,
           total: query ? queriedData.length : total,
         };
-
-        //? Search Query
-        const query = queryParams.query || '';
-        const queriedData = db.students.where((student) =>
-          student.name.includes(query)
-        );
 
         //? Pagination & Search Query Response
         if (schema.students) {
@@ -114,7 +113,7 @@ export function makeServer({ environment = 'development' } = {}) {
               code: 200,
               msg: 'success',
               data: {
-                students: query ? queriedData : paginatedData,
+                students: responseStudentsData,
                 total: limit,
                 paginator,
               },

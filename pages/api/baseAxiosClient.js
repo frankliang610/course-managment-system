@@ -2,7 +2,7 @@ import axios from 'axios';
 import { apiPathsGenerator } from './apiPathsGenerator';
 import formattedResponse from './formattedResponse';
 
-const { formattedError, showResponseMessage } = formattedResponse;
+const { formattedError } = formattedResponse;
 
 const axiosClient = axios.create({
   withCredentials: true,
@@ -11,7 +11,7 @@ const axiosClient = axios.create({
 });
 
 //* GET Method
-const getRequest = async (path, params = null) => {
+const getRequest = async (path, params) => {
   const url = apiPathsGenerator(path, params);
   const response = await axiosClient
     .get(url)
@@ -26,7 +26,7 @@ const postRequest = async (path, data = null, params = null) => {
   const url = apiPathsGenerator(path, params);
   const response = await axiosClient
     .post(url, data)
-    .then((res) => showResponseMessage(res.data))
+    .then((res) => res.data)
     .catch((err) => formattedError(err.response));
 
   return response;
@@ -37,7 +37,7 @@ const deleteRequest = async (path, params = null) => {
   const url = apiPathsGenerator(path, params);
   const response = await axiosClient
     .delete(url)
-    .then((res) => showResponseMessage(res.data))
+    .then((res) => res.data)
     .catch((err) => formattedError(err.response));
 
   return response;

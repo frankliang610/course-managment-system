@@ -14,11 +14,10 @@ const showResponseMessage = (response) => {
 };
 
 const formattedError = (err) => {
-  showResponseMessage(err.data);
-
   return {
-    code: err.code,
+    code: err.data.code,
     msg: err.data.msg,
+    data: false,
   };
 };
 
