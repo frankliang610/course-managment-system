@@ -7,7 +7,7 @@ export const rootPaths = {
 
 export const subPaths = {
   add: 'add',
-  edit: 'edit',
+  update: 'update',
   delete: 'delete',
 };
 

@@ -1,17 +1,26 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { debounce } from 'lodash';
-import { Table, Popconfirm } from 'antd';
+import formatDistanceToNow from 'date-fns/formatDistanceToNow';
+import { Table, Popconfirm, Button, Form } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
 import Layout from '../../components/Layout';
 import {
   StyledATag,
   StyledSearchBar,
+  SearchBarAndNewButtonWrapper,
 } from '../../styles/StyledDashboardComponents';
+import ModalFormWrapper from '../../components/ModalFormWrapper';
+import ModalFormBody from '../../components/ModalFormBody';
 import studentsApiCall from '../api/students';
 
 const Dashboard = () => {
   const [studentsData, setStudentsData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isSearching, setSearching] = useState(false);
+  const [openModal, setOpenModal] = useState(false);
+  const [isAddingNewStudent, setAddingNewStudent] = useState(false);
+  const [studentId, setStudentId] = useState(0);
+  const [form] = Form.useForm();
 
   //? Initialize Pagination Object
   const [pagination, setPagination] = useState({
@@ -78,15 +87,57 @@ const Dashboard = () => {
     });
   };
 
-  //? Delete student action
+  const modalTitle = isAddingNewStudent ? 'Add New Student' : 'Edit Student';
+  const buttonText = isAddingNewStudent ? 'Add' : 'Update';
+
+  const handleEditBtn = (value) => {
+    setAddingNewStudent(false);
+    if (value) {
+      form.setFieldsValue({
+        name: value.name,
+        email: value.email,
+        area: value.area,
+        studentType: value.typeName,
+      });
+      setStudentId(value.id);
+    }
+    setOpenModal(true);
+  };
+
+  //? Modal Control
+  const handleOk = () => {
+    //? Get all input values from the Form by following the sample from antd:
+    //? https://ant.design/components/form/#components-form-demo-form-in-modal
+    form.validateFields().then((values) => {
+      onSubmitForm(values);
+    });
+  };
+
+  const handleCancel = () => {
+    form.resetFields();
+    setOpenModal(false);
+  };
+
+  //? Call add or update student api
+  const onSubmitForm = async (values) => {
+    const response = isAddingNewStudent
+      ? await studentsApiCall.addStudent(values)
+      : await studentsApiCall.updateStudent({ ...values, id: studentId });
+
+    if (response.data) {
+      tableOnChange(pagination);
+      form.resetFields();
+      setOpenModal(false);
+    }
+  };
+
+  //? Call delete student api
   const deleteStudent = async (data) => {
     const { id } = data;
     const response = await studentsApiCall.deleteStudent({ id });
 
     if (response.data) {
-      const afterRemoveTargetStudent = studentsData.filter(
-        (student) => student.id !== id
-      );
+      const afterRemoveTargetStudent = studentsData.filter((student) => student.id !== id);
       setStudentsData(afterRemoveTargetStudent);
       tableOnChange(pagination);
     }
@@ -108,8 +159,8 @@ const Dashboard = () => {
     },
     {
       title: 'Area',
-      dataIndex: 'address',
-      key: 'address',
+      dataIndex: 'area',
+      key: 'area',
       filters: [
         {
           text: '国内',
@@ -123,45 +174,48 @@ const Dashboard = () => {
           text: '加拿大',
           value: '加拿大',
         },
+        {
+          text: '新西兰',
+          value: '新西兰',
+        },
       ],
-      onFilter: (value, record) => record.address.indexOf(value) === 0,
+      onFilter: (value, record) => record.area.indexOf(value) === 0,
     },
     { title: 'Email', dataIndex: 'email', key: 'email' },
     {
       title: 'Selected Curriculum',
-      dataIndex: 'selectedCurriculum',
-      key: 'selectedCurriculum',
+      dataIndex: 'courses',
+      key: 'courses',
     },
     {
       title: 'Student Type',
-      dataIndex: 'studentType',
-      key: 'studentType',
+      dataIndex: 'typeName',
+      key: 'typeName',
       filters: [
         {
-          text: 'Student',
-          value: 'student',
+          text: 'Tester',
+          value: 'tester',
         },
         {
-          text: 'Teacher',
-          value: 'teacher',
-        },
-        {
-          text: 'Manager',
-          value: 'manager',
+          text: 'Developer',
+          value: 'developer',
         },
       ],
-      onFilter: (value, record) => record.address.indexOf(value) === 0,
+      onFilter: (value, record) => record.typeName === value,
     },
-    { title: 'Join Time', dataIndex: 'joinTime', key: 'joinTime' },
+    {
+      title: 'Join Time',
+      dataIndex: 'ctime',
+      key: 'ctime',
+      render: (value, record) => formatDistanceToNow(new Date(value), { addSuffix: true }),
+    },
     {
       title: 'Action',
       dataIndex: 'action',
       key: 'action',
       render: (_, record) => (
         <span>
-          <StyledATag onClick={() => console.log('Edit Btn Clicked')}>
-            Edit
-          </StyledATag>
+          <StyledATag onClick={() => handleEditBtn(record)}>Edit</StyledATag>
           <span className="ant-divider" />
           <Popconfirm
             placement="leftBottom"
@@ -179,14 +233,25 @@ const Dashboard = () => {
 
   return (
     <Layout>
-      <StyledSearchBar
-        placeholder="Search..."
-        allowClear
-        // value={searchBarInputValue}
-        onChange={searchBarOnChange}
-        onSearch={onSearch}
-        loading={isSearching}
-      />
+      <SearchBarAndNewButtonWrapper>
+        <Button
+          icon={<PlusOutlined />}
+          type="primary"
+          onClick={() => {
+            setAddingNewStudent(true);
+            setOpenModal(true);
+          }}
+        >
+          Add
+        </Button>
+        <StyledSearchBar
+          placeholder="Search..."
+          allowClear
+          onChange={searchBarOnChange}
+          onSearch={onSearch}
+          loading={isSearching}
+        />
+      </SearchBarAndNewButtonWrapper>
       <Table
         rowKey="id"
         columns={columns}
@@ -195,6 +260,23 @@ const Dashboard = () => {
         pagination={pagination}
         onChange={tableOnChange}
       />
+      <ModalFormWrapper
+        key="modal-form-wrapper"
+        form={form}
+        visible={openModal}
+        handleCancel={handleCancel}
+        title={modalTitle}
+        footer={[
+          <Button type="primary" htmlType="submit" onClick={handleOk}>
+            {buttonText}
+          </Button>,
+          <Button key="back" onClick={handleCancel}>
+            Cancel
+          </Button>,
+        ]}
+      >
+        <ModalFormBody key="modal-form-body" form={form} />
+      </ModalFormWrapper>
     </Layout>
   );
 };

@@ -1,10 +1,11 @@
-import { belongsTo, createServer, hasMany, Model, Response } from 'miragejs';
+import { createServer, Model, belongsTo, hasMany, Response } from 'miragejs';
 import studentsData from './student.json';
 import usersData from './user.json';
 import courseTypesData from './course_type.json';
 import coursesData from './course.json';
 import studentTypesData from './student_type.json';
 import studentCoursesData from './student_course.json';
+import format from 'date-fns/format';
 
 export function makeServer({ environment = 'development' } = {}) {
   let server = createServer({
@@ -26,11 +27,11 @@ export function makeServer({ environment = 'development' } = {}) {
 
     seeds(server) {
       usersData.forEach((user) => server.create('user', user));
+      studentTypesData.forEach((type) => server.create('studentType', type));
       studentCoursesData.forEach((course) => server.create('studentCourse', course));
       studentsData.forEach((student) => server.create('student', student));
-      studentTypesData.forEach((type) => server.create('studentType', type));
-      coursesData.forEach((course) => server.create('course', course));
       courseTypesData.forEach((type) => server.create('courseType', type));
+      coursesData.forEach((course) => server.create('course', course));
     },
 
     routes() {
@@ -95,11 +96,12 @@ export function makeServer({ environment = 'development' } = {}) {
 
       //? Students List: Get all students
       this.get('/students', (schema, request) => {
-        const { db } = schema;
-        console.log('schema :>> ', schema);
-        console.log('db :>> ', db);
         const { queryParams } = request;
-        const studentsDataFromDb = db.students;
+        const studentsDataFromDb = schema.students.all().models.map((student) => {
+          student.attrs.typeName = student.type.attrs.name; //* Add typeName to student obj
+
+          return student;
+        });
 
         //? Search Query
         const query = queryParams.query || '';
@@ -151,10 +153,80 @@ export function makeServer({ environment = 'development' } = {}) {
       });
 
       //? Students List: Add a new student
-      this.post('/students/add', (schema, request) => {});
+      this.post('/students/add', (schema, request) => {
+        const requestBody = JSON.parse(request.requestBody);
+        const { name, email, area, type } = requestBody;
+        const newStudent = schema.students.create({
+          name,
+          email,
+          area,
+          typeId: type === 'tester' ? 1 : 2, //! temporary solution
+          ctime: format(new Date(), 'yyyy-MM-dd hh:mm:ss'),
+        });
 
-      //? Students List: Edit an existing student
-      this.post('/students/update', (schema, request) => {});
+        newStudent.attrs.typeName = newStudent.type.name;
+
+        if (newStudent) {
+          return new Response(
+            201,
+            {},
+            {
+              code: 201,
+              msg: 'success',
+              data: newStudent,
+            }
+          );
+        } else {
+          return new Response(
+            400,
+            {},
+            {
+              code: 400,
+              msg: 'create new student failed',
+              data: false,
+            }
+          );
+        }
+      });
+
+      //? Students List: Update an existing student
+      this.post('/students/update', (schema, request) => {
+        const requestBody = JSON.parse(request.requestBody);
+        const { id, name, email, area, type } = requestBody;
+        const updateStudent = schema.students.findBy({ id });
+
+        if (updateStudent) {
+          const updatedStudent = updateStudent.update({
+            name,
+            email,
+            area,
+            typeId: type === 'tester' ? 1 : 2, //! temporary solution
+            updateAt: format(new Date(), 'yyyy-MM-dd hh:mm:ss'),
+          });
+
+          updatedStudent.attrs.typeName = updatedStudent.type.name;
+
+          return new Response(
+            200,
+            {},
+            {
+              code: 200,
+              msg: 'success',
+              data: updatedStudent,
+            }
+          );
+        } else {
+          return new Response(
+            400,
+            {},
+            {
+              code: 400,
+              msg: `update failed, cannot find the student ${name}`,
+              data: false,
+            }
+          );
+        }
+      });
 
       //? Students List: Delete an existing student
       this.del('/students/delete', (schema, request) => {
