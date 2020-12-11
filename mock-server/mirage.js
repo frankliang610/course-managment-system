@@ -21,17 +21,17 @@ export function makeServer({ environment = 'development' } = {}) {
       courseType: Model,
       course: Model,
       studentCourse: Model.extend({
-        student: belongsTo(),
+        course: belongsTo(),
       }),
     },
 
     seeds(server) {
+      coursesData.forEach((course) => server.create('course', course));
       usersData.forEach((user) => server.create('user', user));
       studentTypesData.forEach((type) => server.create('studentType', type));
       studentCoursesData.forEach((course) => server.create('studentCourse', course));
       studentsData.forEach((student) => server.create('student', student));
       courseTypesData.forEach((type) => server.create('courseType', type));
-      coursesData.forEach((course) => server.create('course', course));
     },
 
     routes() {
@@ -98,7 +98,18 @@ export function makeServer({ environment = 'development' } = {}) {
       this.get('/students', (schema, request) => {
         const { queryParams } = request;
         const studentsDataFromDb = schema.students.all().models.map((student) => {
-          student.attrs.typeName = student.type.attrs.name; //* Add typeName to student obj
+          let courses;
+
+          if (student.studentCourses.length) {
+            courses = student.studentCourses.models.map((c) => {
+              return {
+                id: c.id,
+                name: c.course.name,
+              };
+            });
+          }
+          student.attrs.courses = courses;
+          student.attrs.typeName = student.type.attrs.name;
 
           return student;
         });
@@ -160,7 +171,7 @@ export function makeServer({ environment = 'development' } = {}) {
           name,
           email,
           area,
-          typeId: type === 'tester' ? 1 : 2, //! temporary solution
+          typeId: type,
           ctime: format(new Date(), 'yyyy-MM-dd hh:mm:ss'),
         });
 
@@ -194,13 +205,12 @@ export function makeServer({ environment = 'development' } = {}) {
         const requestBody = JSON.parse(request.requestBody);
         const { id, name, email, area, type } = requestBody;
         const updateStudent = schema.students.findBy({ id });
-
         if (updateStudent) {
           const updatedStudent = updateStudent.update({
             name,
             email,
             area,
-            typeId: type === 'tester' ? 1 : 2, //! temporary solution
+            typeId: type,
             updateAt: format(new Date(), 'yyyy-MM-dd hh:mm:ss'),
           });
 

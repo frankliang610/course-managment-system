@@ -38,10 +38,10 @@ const ModalFormBody = ({ form }) => {
         </Select>
       </Form.Item>
 
-      <Form.Item name="studentType" label="Student Type" rules={[{ required: true }]}>
+      <Form.Item name="type" label="Student Type" rules={[{ required: true }]}>
         <Select allowClear placeholder="Select a type">
-          <Option value="tester">Tester</Option>
-          <Option value="developer">Developer</Option>
+          <Option value={1}>Tester</Option>
+          <Option value={2}>Developer</Option>
         </Select>
       </Form.Item>
     </Form>

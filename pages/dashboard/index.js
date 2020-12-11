@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { debounce } from 'lodash';
 import formatDistanceToNow from 'date-fns/formatDistanceToNow';
-import { Table, Popconfirm, Button, Form } from 'antd';
+import { Table, Popconfirm, Button, Form, Divider } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import Layout from '../../components/Layout';
 import {
@@ -34,6 +34,7 @@ const Dashboard = () => {
   const [queryParams, setQueryParams] = useState({
     limit: 10,
     page: 1,
+    query: '',
   });
 
   //? Fetch/Refetch/Query Students Data from Db
@@ -45,13 +46,13 @@ const Dashboard = () => {
       setStudentsData(students);
       setPagination({
         ...pagination,
-        current: paginator.page, //* fixed the bug search didn't work on the 2nd page.
+        current: paginator.page,
         total: paginator.total,
       });
       setLoading(false);
       setSearching(false);
     }
-  }, [queryParams, setStudentsData]);
+  }, [queryParams]);
 
   const searchQuery = (queryTerm) => {
     setSearching(true);
@@ -63,16 +64,6 @@ const Dashboard = () => {
 
   //? Delay setQueryParams -> delay refetch students from Db
   const debouncedSearchQuery = useCallback(debounce(searchQuery, 550), []);
-
-  //? Enter keystroke/Click the search icon triggers onSearch function
-  const onSearch = (queryTerm) => {
-    searchQuery(queryTerm);
-  };
-
-  const searchBarOnChange = (e) => {
-    const { value } = e.target;
-    debouncedSearchQuery(value);
-  };
 
   const tableOnChange = (pagination) => {
     setPagination({
@@ -97,7 +88,7 @@ const Dashboard = () => {
         name: value.name,
         email: value.email,
         area: value.area,
-        studentType: value.typeName,
+        type: value.typeName,
       });
       setStudentId(value.id);
     }
@@ -179,13 +170,14 @@ const Dashboard = () => {
           value: '新西兰',
         },
       ],
-      onFilter: (value, record) => record.area.indexOf(value) === 0,
+      onFilter: (value, record) => record.area === value,
     },
     { title: 'Email', dataIndex: 'email', key: 'email' },
     {
       title: 'Selected Curriculum',
       dataIndex: 'courses',
       key: 'courses',
+      render: (courses) => courses?.map((c) => c.name).join(','),
     },
     {
       title: 'Student Type',
@@ -216,7 +208,7 @@ const Dashboard = () => {
       render: (_, record) => (
         <span>
           <StyledATag onClick={() => handleEditBtn(record)}>Edit</StyledATag>
-          <span className="ant-divider" />
+          <Divider type="vertical" />
           <Popconfirm
             placement="leftBottom"
             title={`Are you sure to delete student ${record.name}? `}
@@ -247,8 +239,8 @@ const Dashboard = () => {
         <StyledSearchBar
           placeholder="Search..."
           allowClear
-          onChange={searchBarOnChange}
-          onSearch={onSearch}
+          onChange={(e) => debouncedSearchQuery(e.target.value)}
+          onSearch={() => searchQuery(queryTerm)}
           loading={isSearching}
         />
       </SearchBarAndNewButtonWrapper>
@@ -267,7 +259,7 @@ const Dashboard = () => {
         handleCancel={handleCancel}
         title={modalTitle}
         footer={[
-          <Button type="primary" htmlType="submit" onClick={handleOk}>
+          <Button key="submit" type="primary" htmlType="submit" onClick={handleOk}>
             {buttonText}
           </Button>,
           <Button key="back" onClick={handleCancel}>
