@@ -1,13 +1,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';
-import { Layout, Menu, message } from 'antd';
-import {
-  MenuUnfoldOutlined,
-  MenuFoldOutlined,
-  SelectOutlined,
-  PoweroffOutlined,
-  UserOutlined,
-} from '@ant-design/icons';
+import { Layout, Menu } from 'antd';
+import { MenuUnfoldOutlined, MenuFoldOutlined, PoweroffOutlined } from '@ant-design/icons';
 
 import {
   StyledLayout,
@@ -18,22 +12,30 @@ import {
   StyledBrandIcon,
   StyledIcon,
 } from '../styles/StyledLayoutComponents';
+import routes from './SideBarNavRoutes';
+import CustomizedBreadcrumb from './Breadcrumb';
+import { getUserInfo, deleteUserInfo } from '../utilities/loginUserInfo';
+import { getMenuConfig, customizeMenuItems } from './MenuItems';
 import authApiCall from '../pages/api/auth';
 
 const { Sider } = Layout;
 
 const CustomisedLayout = ({ children }) => {
-  const [collapsed, setCollapsed] = useState(false);
   const router = useRouter();
+  const userInfo = getUserInfo();
+  const [collapsed, setCollapsed] = useState(false);
+  const sideNav = routes[userInfo.loginType];
   const toggle = () => setCollapsed(!collapsed);
   const onCollapse = (collapsed) => setCollapsed(collapsed);
   const logOut = async () => {
     const response = await authApiCall.logout();
     if (response.data) {
-      localStorage.removeItem('user');
+      deleteUserInfo();
       router.push('/login');
     }
   };
+  const { defaultOpenKeys, defaultSelectedKeys } = getMenuConfig(sideNav);
+  const menuItems = customizeMenuItems(sideNav);
 
   return (
     <StyledLayout>
@@ -45,23 +47,16 @@ const CustomisedLayout = ({ children }) => {
             <StyledTitle level={2}>CMS</StyledTitle>
           )}
         </StyledBrandIcon>
-        <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline">
-          <Menu.Item
-            key="1"
-            icon={<UserOutlined />}
-            onClick={() => console.log('Students List is clicked...')}
-          >
-            Students List
-          </Menu.Item>
-          <Menu.Item
-            key="2"
-            icon={<SelectOutlined />}
-            onClick={() => console.log('Select Student is clicked...')}
-          >
-            Select Students
-          </Menu.Item>
+        <Menu
+          theme="dark"
+          mode="inline"
+          defaultOpenKeys={defaultOpenKeys}
+          defaultSelectedKeys={defaultSelectedKeys}
+        >
+          {menuItems}
         </Menu>
       </Sider>
+
       <StyledContentLayout>
         <StyledContentHeader>
           <StyledIcon onClick={toggle}>
@@ -71,6 +66,7 @@ const CustomisedLayout = ({ children }) => {
             <PoweroffOutlined />
           </StyledIcon>
         </StyledContentHeader>
+        <CustomizedBreadcrumb />
         <StyledContent>
           <>{children}</>
         </StyledContent>

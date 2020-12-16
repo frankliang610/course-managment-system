@@ -3,13 +3,10 @@ import { useRouter } from 'next/router';
 import { Col, Form, Input, Checkbox, Radio } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 
-import {
-  StyledButton,
-  StyledRow,
-  StyledTitle,
-} from '../../styles/StyledLoginComponents';
+import { StyledButton, StyledRow, StyledTitle } from '../../styles/StyledLoginComponents';
 import authApiCall from '../api/auth';
 import { Role } from '../../utilities/constant/role';
+import { setUserInfo } from '../../utilities/loginUserInfo';
 
 const LoginPage = () => {
   const router = useRouter();
@@ -19,8 +16,8 @@ const LoginPage = () => {
   const login = async (values) => {
     const response = await authApiCall.login({ ...values, userRole });
     if (response.data) {
-      localStorage.setItem('user', JSON.stringify(response.data));
-      router.push('/dashboard');
+      setUserInfo(response.data);
+      router.push(`/dashboard/${response.data.loginType}`);
     }
   };
 
@@ -43,11 +40,7 @@ const LoginPage = () => {
           <StyledTitle level={2}>Course Management Assistant</StyledTitle>
 
           <Form.Item>
-            <Radio.Group
-              defaultValue={Role.student}
-              value={userRole}
-              onChange={userRoleOnChange}
-            >
+            <Radio.Group defaultValue={Role.student} value={userRole} onChange={userRoleOnChange}>
               <Radio.Button value={Role.student}>Student</Radio.Button>
               <Radio.Button value={Role.teacher}>Teacher</Radio.Button>
               <Radio.Button value={Role.manager}>Manger</Radio.Button>
@@ -84,11 +77,7 @@ const LoginPage = () => {
               },
             ]}
           >
-            <Input
-              prefix={<LockOutlined />}
-              type="password"
-              placeholder="Password"
-            />
+            <Input prefix={<LockOutlined />} type="password" placeholder="Password" />
           </Form.Item>
 
           <Form.Item name="rememberMe" valuePropName="checked">
