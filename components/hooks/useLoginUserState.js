@@ -23,8 +23,7 @@ export const useLoginUserState = () => {
 };
 
 export const useUserType = () => {
-  const router = useRouter();
-  const { loginType } = getUserInfo();
+  const loginType = getUserInfo();
 
-  return loginType || router.pathname.split('/')[2];
+  return loginType;
 };

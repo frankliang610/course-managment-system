@@ -1,13 +1,20 @@
+import { useRouter } from 'next/router';
 const KEY = 'user';
 
 export const getUserInfo = () => {
-  let userInfo;
+  const router = useRouter();
+  let userType = '';
+
   if (typeof window !== 'undefined') {
     const storedLoginInfo = localStorage.getItem(KEY);
-    userInfo = JSON.parse(storedLoginInfo);
+    userType = JSON.parse(storedLoginInfo).type;
   }
 
-  return userInfo;
+  if (!userType) {
+    userType = router.pathname.split('/')[2];
+  }
+
+  return userType;
 };
 
 export const setUserInfo = (info) => {
