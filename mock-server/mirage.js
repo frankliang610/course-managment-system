@@ -5,6 +5,7 @@ import courseTypesData from './course_type.json';
 import coursesData from './course.json';
 import studentTypesData from './student_type.json';
 import studentCoursesData from './student_course.json';
+import studentProfileData from './student-profile.json';
 import format from 'date-fns/format';
 
 export function makeServer({ environment = 'development' } = {}) {
@@ -17,21 +18,28 @@ export function makeServer({ environment = 'development' } = {}) {
       student: Model.extend({
         studentCourses: hasMany(),
         type: belongsTo('studentType'),
+        profile: belongsTo(),
       }),
       courseType: Model,
-      course: Model,
+      course: Model.extend({
+        type: belongsTo('courseType'),
+      }),
       studentCourse: Model.extend({
         course: belongsTo(),
+      }),
+      profile: Model.extend({
+        studentCourses: hasMany(),
       }),
     },
 
     seeds(server) {
+      courseTypesData.forEach((type) => server.create('courseType', type));
       coursesData.forEach((course) => server.create('course', course));
       usersData.forEach((user) => server.create('user', user));
       studentTypesData.forEach((type) => server.create('studentType', type));
       studentCoursesData.forEach((course) => server.create('studentCourse', course));
+      studentProfileData.forEach((student) => server.create('profile', student));
       studentsData.forEach((student) => server.create('student', student));
-      courseTypesData.forEach((type) => server.create('courseType', type));
     },
 
     routes() {
@@ -160,6 +168,44 @@ export function makeServer({ environment = 'development' } = {}) {
             }
           );
           return failedResponse;
+        }
+      });
+
+      //? Student Detail: Show student Profile
+      this.get('/students/detail', (schema, request) => {
+        const { id } = request.queryParams;
+        const student = schema.students.findBy({ id });
+        const selectedStudent = student.profile;
+
+        if (selectedStudent) {
+          selectedStudent.attrs.courses = selectedStudent.studentCourses.models.map((sc) => {
+            sc.attrs.name = sc.course.attrs.name;
+            sc.attrs.type = sc.course.type.attrs.name;
+
+            return sc;
+          });
+
+          selectedStudent.attrs.typeName = student.type.attrs.name;
+
+          return new Response(
+            200,
+            {},
+            {
+              code: 200,
+              msg: 'Success',
+              data: selectedStudent,
+            }
+          );
+        } else {
+          return new Response(
+            400,
+            {},
+            {
+              code: 400,
+              msg: 'Profile does NOT exist!!',
+              data: false,
+            }
+          );
         }
       });
 

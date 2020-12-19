@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { debounce } from 'lodash';
 import formatDistanceToNow from 'date-fns/formatDistanceToNow';
 import { Table, Popconfirm, Button, Form, Divider } from 'antd';
@@ -11,7 +13,7 @@ import {
 } from '../../../../styles/StyledDashboardComponents';
 import ModalFormWrapper from '../../../../components/ModalFormWrapper';
 import ModalFormBody from '../../../../components/ModalFormBody';
-import studentsApiCall from '../../../api/students';
+import studentsApiCall from '../../../../api-service/students';
 
 const StudentsList = () => {
   const [studentsData, setStudentsData] = useState([]);
@@ -134,6 +136,9 @@ const StudentsList = () => {
     }
   };
 
+  const router = useRouter();
+  const path = router.pathname;
+
   //? StudentsList Table Columns Format
   const columns = [
     {
@@ -147,6 +152,11 @@ const StudentsList = () => {
       dataIndex: 'name',
       key: 'name',
       sorter: (a, b) => a.name.localeCompare(b.name),
+      render: (_, record) => (
+        <span>
+          <Link href={`${path}/${record.id}`}>{record.name}</Link>
+        </span>
+      ),
     },
     {
       title: 'Area',
