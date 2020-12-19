@@ -21,9 +21,15 @@ const deleteStudent = async (studentId) =>
     .deleteRequest([rootPaths.students, subPaths.delete], studentId)
     .then((res) => showResponseMessage(res));
 
+const getStudentById = async (studentId) =>
+  await axiosClient
+    .getRequest([rootPaths.students, subPaths.detail], { id: studentId })
+    .then((res) => showResponseMessage(res));
+
 export default {
   getStudents,
   addStudent,
   updateStudent,
   deleteStudent,
+  getStudentById,
 };

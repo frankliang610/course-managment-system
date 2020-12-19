@@ -16,7 +16,7 @@ import routes from './SideBarNavRoutes';
 import CustomizedBreadcrumb from './Breadcrumb';
 import { getUserInfo, deleteUserInfo } from '../utilities/loginUserInfo';
 import { getMenuConfig, customizeMenuItems } from './MenuItems';
-import authApiCall from '../pages/api/auth';
+import authApiCall from '../api-service/auth';
 
 const { Sider } = Layout;
 

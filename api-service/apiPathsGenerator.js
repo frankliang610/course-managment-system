@@ -9,6 +9,7 @@ export const subPaths = {
   add: 'add',
   update: 'update',
   delete: 'delete',
+  detail: 'detail',
 };
 
 export const apiPathsGenerator = (paths, params) => {

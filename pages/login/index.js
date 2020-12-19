@@ -4,7 +4,7 @@ import { Col, Form, Input, Checkbox, Radio } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 
 import { StyledButton, StyledRow, StyledTitle } from '../../styles/StyledLoginComponents';
-import authApiCall from '../api/auth';
+import authApiCall from '../../api-service/auth';
 import { Role } from '../../utilities/constant/role';
 import { setUserInfo } from '../../utilities/loginUserInfo';
 
