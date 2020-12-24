@@ -48,7 +48,7 @@ const CustomizedBreadcrumb = () => {
                 );
               });
         })
-        .flat(1)}
+        .reduce((acc, cur) => [...acc, ...cur], [])}
     </StyledBreadcrumb>
   );
 };

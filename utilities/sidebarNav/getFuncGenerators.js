@@ -44,10 +44,10 @@ const generateKeyPathInfo = (data) => {
   const getPaths = generateFactory(generatePath);
   const userType = useUserType();
   const paths = getPaths(data)
-    .flat(1)
+    .reduce((acc, cur) => [...acc, ...cur], [])
     .map((item) => ['/dashboard', userType, item].filter((item) => !!item).join('/'));
   const getKeys = generateFactory(generateKey);
-  const keys = getKeys(data).flat();
+  const keys = getKeys(data).reduce((acc, cur) => [...acc, ...cur], []);
 
   return { keys, paths };
 };
