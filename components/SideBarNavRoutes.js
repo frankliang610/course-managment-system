@@ -15,6 +15,8 @@ const routePath = {
   students: 'students',
   selectStudents: 'selectStudents',
   courses: 'courses',
+  addCourse: 'addCourse',
+  editCourse: 'editCourse',
 };
 
 const overview = {
@@ -62,9 +64,26 @@ const teachers = {
 };
 
 const courses = {
-  path: [routePath.courses],
+  path: [],
   label: 'Courses',
   icon: <TabletOutlined />,
+  subNav: [
+    {
+      path: [routePath.courses],
+      label: 'All Courses',
+      icon: <TabletOutlined />,
+    },
+    {
+      path: [routePath.addCourses],
+      label: 'Add Course',
+      icon: <TabletOutlined />,
+    },
+    {
+      path: [routePath.editCourse],
+      label: 'Edit Course',
+      icon: <TabletOutlined />,
+    },
+  ],
 };
 
 const routes = {

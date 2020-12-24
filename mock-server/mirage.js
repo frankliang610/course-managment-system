@@ -6,6 +6,7 @@ import coursesData from './course.json';
 import studentTypesData from './student_type.json';
 import studentCoursesData from './student_course.json';
 import studentProfileData from './student-profile.json';
+import teachersData from './teacher.json';
 import format from 'date-fns/format';
 
 export function makeServer({ environment = 'development' } = {}) {
@@ -23,6 +24,7 @@ export function makeServer({ environment = 'development' } = {}) {
       courseType: Model,
       course: Model.extend({
         type: belongsTo('courseType'),
+        teacher: belongsTo(),
       }),
       studentCourse: Model.extend({
         course: belongsTo(),
@@ -30,9 +32,11 @@ export function makeServer({ environment = 'development' } = {}) {
       profile: Model.extend({
         studentCourses: hasMany(),
       }),
+      teacher: Model,
     },
 
     seeds(server) {
+      teachersData.forEach((teacher) => server.create('teacher', teacher));
       courseTypesData.forEach((type) => server.create('courseType', type));
       coursesData.forEach((course) => server.create('course', course));
       usersData.forEach((user) => server.create('user', user));
@@ -309,6 +313,60 @@ export function makeServer({ environment = 'development' } = {}) {
               data: false,
             }
           );
+        }
+      });
+
+      this.get('/courses', (schema, request) => {
+        const { queryParams } = request;
+        const coursesDataFromDb = schema.courses.all().models;
+
+        coursesDataFromDb.forEach((course) => {
+          course.attrs.teacherName = course.teacher.attrs.name;
+          course.attrs.typeName = course.type.attrs.name;
+        });
+
+        //? Pagination
+        const page = parseInt(queryParams.page, 10) || 1;
+        const limit = parseInt(queryParams.limit, 10) || 10;
+        const startIndex = (page - 1) * limit;
+        const endIndex = page * limit;
+        const total = coursesDataFromDb.length;
+        const paginatedData = coursesDataFromDb.slice(startIndex, endIndex);
+        const responseCoursesData = paginatedData;
+
+        const paginator = {
+          limit,
+          page,
+          total,
+        };
+
+        //? Pagination  Response
+        if (schema.courses) {
+          const successResponse = new Response(
+            200,
+            {},
+            {
+              code: 200,
+              msg: 'success',
+              data: {
+                courses: responseCoursesData,
+                total: limit,
+                paginator,
+              },
+            }
+          );
+          return successResponse;
+        } else {
+          //? Pagination & Search Query failure
+          const failedResponse = new Response(
+            404,
+            {},
+            {
+              code: 400,
+              msg: 'Data query failed',
+            }
+          );
+          return failedResponse;
         }
       });
     },

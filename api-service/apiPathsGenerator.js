@@ -3,6 +3,8 @@ export const rootPaths = {
   logout: 'logout',
   student: 'student',
   students: 'students',
+  course: 'course',
+  courses: 'courses',
 };
 
 export const subPaths = {
