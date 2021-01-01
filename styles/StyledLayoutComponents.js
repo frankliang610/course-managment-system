@@ -5,11 +5,12 @@ const { Header, Content } = Layout;
 const { Title } = Typography;
 
 export const StyledLayout = styled(Layout)`
-  min-height: 100vh;
+  height: 100vh;
 `;
 
 export const StyledContentLayout = styled(Layout)`
   background: #fff;
+  overflow: hidden;
 `;
 
 export const StyledTitle = styled(Title)`
@@ -24,7 +25,9 @@ export const StyledContentHeader = styled(Header)`
 `;
 
 export const StyledContent = styled(Content)`
-  margin: 16px;
+  background-color: #fff;
+  padding: 16px;
+  min-height: auto;
 `;
 
 export const StyledBrandIcon = styled.div`

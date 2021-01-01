@@ -332,13 +332,6 @@ export function makeServer({ environment = 'development' } = {}) {
         const endIndex = page * limit;
         const total = coursesDataFromDb.length;
         const paginatedData = coursesDataFromDb.slice(startIndex, endIndex);
-        const responseCoursesData = paginatedData;
-
-        const paginator = {
-          limit,
-          page,
-          total,
-        };
 
         //? Pagination  Response
         if (schema.courses) {
@@ -349,9 +342,8 @@ export function makeServer({ environment = 'development' } = {}) {
               code: 200,
               msg: 'success',
               data: {
-                courses: responseCoursesData,
-                total: limit,
-                paginator,
+                courses: paginatedData,
+                total,
               },
             }
           );

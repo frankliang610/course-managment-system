@@ -2,16 +2,38 @@ import React, { useState, useEffect } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import styled from 'styled-components';
 import Link from 'next/link';
-import { List, Spin, Button, BackTop } from 'antd';
+import { List, Spin, Button, BackTop, Typography } from 'antd';
+import { VerticalAlignTopOutlined } from '@ant-design/icons';
 import Layout from '../../../../components/Layout';
 import CourseOverview from '../../../../components/CourseOverview';
 import coursesApiCall from '../../../../api-service/courses';
 
-const Indicator = styled.div`
+const { Text } = Typography;
+
+const StyledText = styled(Text)`
   position: relative;
   left: 50%;
+`;
+
+const Indicator = styled.div`
   margin-top: 10px;
   transform: translateX(50%);
+`;
+
+const BackToTopIcon = styled(VerticalAlignTopOutlined)`
+  position: fixed;
+  bottom: 60px;
+  right: 36px;
+  z-index: 10;
+  font-size: 40px;
+  color: #fff;
+  padding: 5px;
+  background: rgba(0, 0, 0, 0.3);
+  opacity: 0.5;
+  transition: all 0.5s;
+  :hover {
+    opacity: 0.8;
+  }
 `;
 
 const Courses = () => {
@@ -21,6 +43,7 @@ const Courses = () => {
     page: 1,
   });
   const [hasMore, setHasMore] = useState(true);
+
   useEffect(() => {
     coursesApiCall.getCourses(paginator).then((res) => {
       const { total, courses: fetchedCourses } = res.data;
@@ -40,7 +63,10 @@ const Courses = () => {
   return (
     <Layout>
       <InfiniteScroll
-        dataLength={courses.length} //This is important field to render the next data
+        height={'85vh'}
+        width={'auto'}
+        className="infinite-scroll"
+        dataLength={courses.length}
         next={fetchMoreData}
         hasMore={hasMore}
         loader={
@@ -48,9 +74,8 @@ const Courses = () => {
             <Spin size="default" />
           </Indicator>
         }
-        endMessage={<p>No more Courses!</p>}
-        scrollableTarget="layoutContent"
-        style={{ overflow: 'hidden' }}
+        endMessage={<StyledText strong>No more Courses!</StyledText>}
+        style={{ overflowX: 'hidden' }}
       >
         <List
           id="list-container"
@@ -76,7 +101,11 @@ const Courses = () => {
           )}
         />
       </InfiniteScroll>
-      <BackTop />
+      <BackTop target={() => document.getElementsByClassName('infinite-scroll')[0]}>
+        <div>
+          <BackToTopIcon />
+        </div>
+      </BackTop>
     </Layout>
   );
 };

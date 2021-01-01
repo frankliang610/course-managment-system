@@ -1380,7 +1380,7 @@
     "star": 3,
     "durationUnit": 1,
     "status": 0,
-    "duration": "{count: 3, unit: 'day'}",
+    "duration": 3,
     "cover": "http://v.bootstrapmb.com/2020/11/cbgse9169/images/courses/pic1.jpg",
     "teacherId": 2,
     "typeId": 17,

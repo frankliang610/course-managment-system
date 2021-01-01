@@ -67,7 +67,7 @@ const CustomisedLayout = ({ children }) => {
           </StyledIcon>
         </StyledContentHeader>
         <CustomizedBreadcrumb />
-        <StyledContent id="layoutContent">{children}</StyledContent>
+        <StyledContent>{children}</StyledContent>
       </StyledContentLayout>
     </StyledLayout>
   );
