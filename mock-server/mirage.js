@@ -1,3 +1,4 @@
+import { inflections } from 'inflected';
 import { createServer, Model, belongsTo, hasMany, Response } from 'miragejs';
 import studentsData from './student.json';
 import usersData from './user.json';
@@ -7,9 +8,15 @@ import studentTypesData from './student_type.json';
 import studentCoursesData from './student_course.json';
 import studentProfileData from './student-profile.json';
 import teachersData from './teacher.json';
+import scheduleData from './schedule.json';
+import salesData from './sales.json';
 import format from 'date-fns/format';
 
 export function makeServer({ environment = 'development' } = {}) {
+  inflections('en', function (inflect) {
+    inflect.irregular('sales', 'sales');
+  });
+
   let server = createServer({
     environment,
 
@@ -25,6 +32,8 @@ export function makeServer({ environment = 'development' } = {}) {
       course: Model.extend({
         type: belongsTo('courseType'),
         teacher: belongsTo(),
+        schedule: belongsTo(),
+        sales: belongsTo(),
       }),
       studentCourse: Model.extend({
         course: belongsTo(),
@@ -33,11 +42,15 @@ export function makeServer({ environment = 'development' } = {}) {
         studentCourses: hasMany(),
       }),
       teacher: Model,
+      schedule: Model,
+      sales: Model,
     },
 
     seeds(server) {
       teachersData.forEach((teacher) => server.create('teacher', teacher));
       courseTypesData.forEach((type) => server.create('courseType', type));
+      scheduleData.forEach((schedule) => server.create('schedule', schedule));
+      salesData.forEach((sales) => server.create('sales', sales));
       coursesData.forEach((course) => server.create('course', course));
       usersData.forEach((user) => server.create('user', user));
       studentTypesData.forEach((type) => server.create('studentType', type));
@@ -321,7 +334,7 @@ export function makeServer({ environment = 'development' } = {}) {
         const coursesDataFromDb = schema.courses.all().models;
 
         coursesDataFromDb.forEach((course) => {
-          course.attrs.teacherName = course.teacher.attrs.name;
+          course.attrs.teacher = course.teacher.attrs.name;
           course.attrs.typeName = course.type.attrs.name;
         });
 
@@ -333,7 +346,7 @@ export function makeServer({ environment = 'development' } = {}) {
         const total = coursesDataFromDb.length;
         const paginatedData = coursesDataFromDb.slice(startIndex, endIndex);
 
-        //? Pagination  Response
+        //? Pagination Response
         if (schema.courses) {
           const successResponse = new Response(
             200,
@@ -359,6 +372,39 @@ export function makeServer({ environment = 'development' } = {}) {
             }
           );
           return failedResponse;
+        }
+      });
+
+      //? Course Detail: Show course detail
+      this.get('/courses/detail', (schema, request) => {
+        const { id } = request.queryParams;
+        const selectedCourse = schema.courses.findBy({ id });
+
+        if (selectedCourse) {
+          selectedCourse.attrs.sales = selectedCourse.sales.attrs;
+          selectedCourse.attrs.schedule = selectedCourse.schedule.attrs;
+          selectedCourse.attrs.teacher = selectedCourse.teacher.attrs.name;
+          selectedCourse.attrs.typeName = selectedCourse.type.attrs.name;
+
+          return new Response(
+            200,
+            {},
+            {
+              code: 200,
+              msg: 'Success',
+              data: selectedCourse,
+            }
+          );
+        } else {
+          return new Response(
+            400,
+            {},
+            {
+              code: 400,
+              msg: 'Course does NOT exist!!',
+              data: false,
+            }
+          );
         }
       });
     },
