@@ -6,6 +6,8 @@ import { DurationUnit } from '../utilities/constant/duration';
 
 const StyledRow = styled(Row)`
   position: relative;
+  margin-top: 18px;
+  margin-bottom: 18px;
   ::after {
     content: '';
     position: absolute;
