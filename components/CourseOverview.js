@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { Card, Row, Col } from 'antd';
 import { HeartFilled, UserOutlined } from '@ant-design/icons';
-import { DurationUnit } from '../utilities/constant/duration';
+import { durationUnit, gutter } from '../utilities/constant';
 
 const StyledRow = styled(Row)`
   position: relative;
@@ -18,14 +18,8 @@ const StyledRow = styled(Row)`
   }
 `;
 
-const gutter = {
-  xs: 8,
-  sm: 16,
-  md: 24,
-};
-
-const getDurationText = (duration, durationUnit) => {
-  const text = `${duration} ${DurationUnit[durationUnit]}`;
+const getDurationText = (duration, unit) => {
+  const text = `${duration} ${durationUnit[unit]}`;
   const displayText = duration > 1 ? text + 's' : text;
 
   return displayText;

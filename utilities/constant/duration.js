@@ -1,6 +1,7 @@
-export const DurationUnit = {
-  1: 'year',
-  2: 'month',
-  3: 'week',
-  4: 'day',
+export const durationUnit = {
+  year: 'year',
+  month: 'month',
+  week: 'week',
+  day: 'day',
+  hour: 'hour',
 };

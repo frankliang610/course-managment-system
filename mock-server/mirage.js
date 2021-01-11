@@ -407,6 +407,112 @@ export function makeServer({ environment = 'development' } = {}) {
           );
         }
       });
+
+      //? Get a Course Code for adding a new Course
+      this.get('/courses/generate-code', (schema, request) => {
+        return new Response(
+          200,
+          {},
+          {
+            code: 200,
+            msg: 'Success',
+            data: Math.random().toString(32).split('.')[1],
+          }
+        );
+      });
+
+      //? Get types for adding a new Course
+      this.get('/courses/course-types', (schema, request) => {
+        const types = schema.courseTypes.all().models.map((ct) => ct);
+
+        return new Response(
+          200,
+          {},
+          {
+            code: 200,
+            msg: 'Success',
+            data: types,
+          }
+        );
+      });
+
+      //? Get a teacher for creating a new Course
+      this.get('/courses/course-teachers', (schema, request) => {
+        const { queryParams } = request;
+        const query = queryParams.query.toLocaleLowerCase() || '';
+        const teachers = schema.teachers
+          .all()
+          .models.filter((t) => t.attrs.name.toLowerCase().includes(query));
+
+        return new Response(
+          200,
+          {},
+          {
+            code: 200,
+            msg: 'Success',
+            data: { teachers },
+          }
+        );
+      });
+
+      //? Add a new course
+      this.post('/courses/add', (schema, request) => {
+        const newCourse = 'new student';
+
+        if (newCourse) {
+          return new Response(
+            201,
+            {},
+            {
+              code: 201,
+              msg: 'success',
+              data: newCourse,
+            }
+          );
+        } else {
+          return new Response(
+            400,
+            {},
+            {
+              code: 400,
+              msg: 'create new course failed',
+              data: false,
+            }
+          );
+        }
+      });
+
+      //? Update an existing course
+      this.post('/courses/update', (schema, request) => {
+        const requestBody = JSON.parse(request.requestBody);
+        const updateCourse = 'update course';
+
+        if (updateCourse) {
+          return new Response(
+            200,
+            {},
+            {
+              code: 200,
+              msg: 'success',
+              data: updateCourse,
+            }
+          );
+        } else {
+          return new Response(
+            400,
+            {},
+            {
+              code: 400,
+              msg: `update failed, cannot find the course`,
+              data: false,
+            }
+          );
+        }
+      });
+
+      this.post('https://www.mocky.io/v2/5cc8019d300000980a055e76', (schema, request) => {
+        console.log('Image uploaded');
+      });
     },
   });
 

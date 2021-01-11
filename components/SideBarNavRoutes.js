@@ -74,12 +74,12 @@ const courses = {
       icon: <TabletOutlined />,
     },
     {
-      path: [routePath.addCourses],
+      path: [`${routePath.courses}/${routePath.addCourse}`],
       label: 'Add Course',
       icon: <TabletOutlined />,
     },
     {
-      path: [routePath.editCourse],
+      path: [`${routePath.courses}/${routePath.editCourse}`],
       label: 'Edit Course',
       icon: <TabletOutlined />,
     },

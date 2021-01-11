@@ -12,7 +12,31 @@ const getCourseById = async (courseId) =>
     .getRequest([rootPaths.courses, subPaths.detail], { id: courseId })
     .then((res) => showResponseMessage(res));
 
+const addCourse = async (newCourse) =>
+  await axiosClient
+    .postRequest([rootPaths.courses, subPaths.add], newCourse)
+    .then((res) => showResponseMessage(res));
+
+const updateCourse = async (updateCourseData) =>
+  await axiosClient
+    .postRequest([rootPaths.courses, subPaths.update], updateCourseData)
+    .then((res) => showResponseMessage(res));
+
+const getCourseTypes = async () =>
+  await axiosClient.getRequest([rootPaths.courses, subPaths.courseTypes]);
+
+const createCourseCode = async () =>
+  await axiosClient.getRequest([rootPaths.courses, subPaths.generateCode]);
+
+const getTeachers = async (params) =>
+  await axiosClient.getRequest([rootPaths.courses, subPaths.courseTeachers], params);
+
 export default {
   getCourses,
   getCourseById,
+  addCourse,
+  updateCourse,
+  getCourseTypes,
+  createCourseCode,
+  getTeachers,
 };

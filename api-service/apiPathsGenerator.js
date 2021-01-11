@@ -12,6 +12,9 @@ export const subPaths = {
   update: 'update',
   delete: 'delete',
   detail: 'detail',
+  generateCode: 'generate-code',
+  courseTypes: 'course-types',
+  courseTeachers: 'course-teachers',
 };
 
 export const apiPathsGenerator = (paths, params) => {

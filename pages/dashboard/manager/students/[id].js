@@ -10,6 +10,7 @@ import {
   StyledText,
   StyledTag,
 } from '../../../../styles/StyledStudentDetailComponent';
+import { gutter } from '../../../../utilities/constant';
 
 export const getServerSideProps = async (context) => {
   const { id } = context.params;
@@ -100,10 +101,10 @@ const Student = ({ id }) => {
 
   return (
     <Layout>
-      <Row gutter={[6, 16]}>
+      <Row gutter={gutter}>
         <Col span={8}>
           <Card title={<StyledAvatar src={studentDetail?.avatar} />}>
-            <Row gutter={[6, 16]}>
+            <Row gutter={gutter}>
               {contact?.map((i) => (
                 <StyledInnerCol span={12} key={i.label}>
                   <Text strong>{i.label}</Text>
@@ -111,7 +112,7 @@ const Student = ({ id }) => {
                 </StyledInnerCol>
               ))}
             </Row>
-            <Row gutter={[6, 16]}>
+            <Row gutter={gutter}>
               <StyledInnerCol span={24} key="address">
                 <Text strong>Address</Text>
                 <Text>{studentDetail?.address}</Text>
@@ -125,7 +126,7 @@ const Student = ({ id }) => {
             <Tabs defaultValue="1" animated={true}>
               <Tabs.TabPane tab="About" key="1">
                 <StyledTitle level={3}>Information</StyledTitle>
-                <Row gutter={[6, 16]}>
+                <Row gutter={gutter}>
                   {about?.map((a) => (
                     <Col span={24} key={a.label}>
                       <StyledText strong>{a.label}:</StyledText>
@@ -135,7 +136,7 @@ const Student = ({ id }) => {
                 </Row>
 
                 <StyledTitle level={3}>Interesting</StyledTitle>
-                <Row gutter={[6, 16]}>
+                <Row gutter={gutter}>
                   <Col>
                     {studentDetail?.interest?.map((interest, index) => {
                       return (
@@ -148,7 +149,7 @@ const Student = ({ id }) => {
                 </Row>
 
                 <StyledTitle level={3}>Description</StyledTitle>
-                <Row gutter={[6, 16]}>
+                <Row gutter={gutter}>
                   <Col>
                     <Paragraph>{studentDetail?.description}</Paragraph>
                   </Col>

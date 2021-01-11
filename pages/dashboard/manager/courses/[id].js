@@ -6,7 +6,7 @@ import styled from 'styled-components';
 import WeeklyTimeTable from '../../../../components/WeeklyTimeTable';
 import Layout from '../../../../components/Layout';
 import CourseOverview from '../../../../components/CourseOverview';
-import CourseStatus from '../../../../utilities/constant/courseStatus';
+import { courseStatus, gutter } from '../../../../utilities/constant';
 import coursesApiCall from '../../../../api-service/courses';
 
 const { Title, Text } = Typography;
@@ -74,7 +74,6 @@ const Course = ({ id }) => {
   const [courseBrief, setCourseBrief] = useState([]);
   const [currentChapterIndex, setCurrentChapterIndex] = useState(0);
   const [data, setData] = useState(null);
-  const gutter = [6, 16];
 
   useEffect(() => {
     (async () => {
@@ -129,7 +128,7 @@ const Course = ({ id }) => {
                 <StyledSubTitle level={3}>Start Time</StyledSubTitle>
                 <Row>{data.startTime}</Row>
 
-                <Badge status={CourseStatus[data.status]} offset={[5, 24]}>
+                <Badge status={courseStatus[data.status]} offset={[5, 24]}>
                   <StyledSubTitle level={3}>Status</StyledSubTitle>
                 </Badge>
                 <Row>
