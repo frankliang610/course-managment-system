@@ -316,7 +316,7 @@ const AddCourseForm = ({ course, onSuccess }) => {
 
         <Row gutter={gutter}>
           <Col span={8}>
-            {/* <Form.Item label="Start Date" name="startTime">
+            <Form.Item label="Start Date" name="startTime">
               <DatePicker
                 style={{ width: '100%' }}
                 disabledDate={(passedDate) => {
@@ -325,7 +325,7 @@ const AddCourseForm = ({ course, onSuccess }) => {
                   return date < today;
                 }}
               />
-            </Form.Item> */}
+            </Form.Item>
 
             <Form.Item label="Price" name="price" rules={[{ required: true }]}>
               <InputNumber
