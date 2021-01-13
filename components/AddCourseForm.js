@@ -21,7 +21,9 @@ import ImgCrop from 'antd-img-crop';
 import format from 'date-fns/fp/format';
 import getTime from 'date-fns/getTime';
 import styled from 'styled-components';
-import { durationUnit, gutter, validateMessages } from '../utilities/constant';
+import durationUnit from '../utilities/constant/duration';
+import gutter from '../utilities/constant/gutter';
+import validateMessages from '../utilities/constant/validateMessages';
 
 const TextAreaWrapper = styled(Form.Item)`
   .ant-form-item-control {
@@ -50,10 +52,9 @@ const UploadWrapper = styled(Form.Item)`
   }
   .ant-upload-picture-card-wrapper,
   .ant-form-item-control-input,
-  .ant-form-item-control-input-content div {
+  .ant-form-item-control-input div {
     height: 100%;
   }
-
   .ant-upload-picture-card-wrapper img {
     object-fit: cover !important;
   }
@@ -121,7 +122,7 @@ const AddCourseForm = ({ course, onSuccess }) => {
   const [isUploading, setUploading] = useState(false);
   const [isTeacherSearching, setTeacherSearching] = useState(false);
   const [teachers, setTeachers] = useState([]);
-  const [isCourseAdded, setCourseAdded] = useState(course === undefined);
+  const [isCourseAdded, setCourseAdded] = useState(course === null);
   const [preview, setPreview] = useState({
     previewTitle: '',
     previewVisible: false,
@@ -129,7 +130,7 @@ const AddCourseForm = ({ course, onSuccess }) => {
   });
 
   const suffixUnit = (
-    <Form.Item name="durationUnit">
+    <Form.Item name="durationUnit" noStyle>
       <Select defaultValue={durationUnit.month} style={{ width: 100 }}>
         {Object.values(durationUnit).map((unit, index) => {
           return (
@@ -169,16 +170,16 @@ const AddCourseForm = ({ course, onSuccess }) => {
   };
 
   const onFinish = async (values) => {
-    if (!isCourseAdded && !course) {
-      message.error('One course must be selected to update');
-      return;
-    }
+    // if (!isCourseAdded && !course) {
+    //   message.error('One course must be selected to update');
+    //   return;
+    // }
 
     const newCourse = {
       ...values,
       duration: +values.duration.number,
       typeId: +values.typeId,
-      startTime: format(new Date(), 'yyyy-MM-dd'), // Error invalid time value, tried parse() and parseISO()
+      startTime: '2021-01-01', // Error invalid time value, tried parse() and parseISO()
       teacherId: +values.teacherId || +course.teacherId,
       durationUnit: +values.duration.unit,
     };
@@ -210,7 +211,7 @@ const AddCourseForm = ({ course, onSuccess }) => {
         ...course,
         typeId: String(course.typeId),
         teacherId: course.teacherName,
-        startTime: new Date(course.startTime),
+        startTime: course.startTime,
         duration: {
           number: course.duration,
           unit: course.durationUnit,
@@ -317,14 +318,14 @@ const AddCourseForm = ({ course, onSuccess }) => {
         <Row gutter={gutter}>
           <Col span={8}>
             <Form.Item label="Start Date" name="startTime">
-              <DatePicker
+              {/* <DatePicker
                 style={{ width: '100%' }}
                 disabledDate={(passedDate) => {
                   const today = getTime(new Date());
                   const date = passedDate.valueOf();
                   return date < today;
                 }}
-              />
+              /> */}
             </Form.Item>
 
             <Form.Item label="Price" name="price" rules={[{ required: true }]}>

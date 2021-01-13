@@ -4,16 +4,19 @@ import { Button, Result, Steps } from 'antd';
 import Layout from '../../../../components/Layout';
 import AddCourseDetailForm from '../../../../components/AddCourseForm';
 import AddChapterDetailForm from '../../../../components/AddChapterDetailForm';
-import { getUserInfo as userRole } from '../../../../utilities/loginUserInfo';
+import { getUserInfo } from '../../../../utilities/loginUserInfo';
 
 const { Step } = Steps;
 
 const AddCourse = () => {
+  const router = useRouter();
+  const userRole = getUserInfo();
   const [step, setStep] = useState(0);
+  const [course, setCourse] = useState(null);
   const [courseId, setCourseId] = useState(0);
   const [scheduleId, setScheduleId] = useState(0);
+  const [processId, setProcessId] = useState(0);
   const [navigate, setNavigate] = useState([0]);
-  const router = useRouter();
   const next = () => {
     setStep(step + 1);
     setNavigate([...navigate, step + 1]);
@@ -22,12 +25,20 @@ const AddCourse = () => {
   const steps = [
     <AddCourseDetailForm
       onSuccess={(course) => {
+        setCourse(course);
         setCourseId(course.id);
         setScheduleId(course.scheduleId);
+        setProcessId(course.processId);
         next();
       }}
+      course={course}
     />,
-    <AddChapterDetailForm courseId={courseId} scheduleId={scheduleId} onSuccess={next} />,
+    <AddChapterDetailForm
+      courseId={courseId}
+      scheduleId={scheduleId}
+      processId={processId}
+      onSuccess={next}
+    />,
     <Result
       status="success"
       title="Create Course Successfully"

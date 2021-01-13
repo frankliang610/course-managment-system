@@ -15,6 +15,7 @@ export const subPaths = {
   generateCode: 'generate-code',
   courseTypes: 'course-types',
   courseTeachers: 'course-teachers',
+  courseProcess: 'course-process',
 };
 
 export const apiPathsGenerator = (paths, params) => {

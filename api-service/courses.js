@@ -28,6 +28,11 @@ const getCourseTypes = async () =>
 const createCourseCode = async () =>
   await axiosClient.getRequest([rootPaths.courses, subPaths.generateCode]);
 
+const updateCourseProcess = async (updateCourseProcess) =>
+  await axiosClient
+    .postRequest([rootPaths.courses, subPaths.courseProcess], updateCourseProcess)
+    .then((res) => showResponseMessage(res));
+
 const getTeachers = async (params) =>
   await axiosClient.getRequest([rootPaths.courses, subPaths.courseTeachers], params);
 
@@ -38,5 +43,6 @@ export default {
   updateCourse,
   getCourseTypes,
   createCourseCode,
+  updateCourseProcess,
   getTeachers,
 };

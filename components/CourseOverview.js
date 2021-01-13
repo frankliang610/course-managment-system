@@ -2,7 +2,8 @@ import React from 'react';
 import styled from 'styled-components';
 import { Card, Row, Col } from 'antd';
 import { HeartFilled, UserOutlined } from '@ant-design/icons';
-import { durationUnit, gutter } from '../utilities/constant';
+import gutter from '../utilities/constant/gutter';
+import durationUnit from '../utilities/constant/duration';
 
 const StyledRow = styled(Row)`
   position: relative;

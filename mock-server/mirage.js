@@ -10,6 +10,7 @@ import studentProfileData from './student-profile.json';
 import teachersData from './teacher.json';
 import scheduleData from './schedule.json';
 import salesData from './sales.json';
+import processData from './process.json';
 import format from 'date-fns/format';
 
 export function makeServer({ environment = 'development' } = {}) {
@@ -44,6 +45,7 @@ export function makeServer({ environment = 'development' } = {}) {
       teacher: Model,
       schedule: Model,
       sales: Model,
+      process: Model,
     },
 
     seeds(server) {
@@ -51,6 +53,7 @@ export function makeServer({ environment = 'development' } = {}) {
       courseTypesData.forEach((type) => server.create('courseType', type));
       scheduleData.forEach((schedule) => server.create('schedule', schedule));
       salesData.forEach((sales) => server.create('sales', sales));
+      processData.forEach((process) => server.create('process', process));
       coursesData.forEach((course) => server.create('course', course));
       usersData.forEach((user) => server.create('user', user));
       studentTypesData.forEach((type) => server.create('studentType', type));
@@ -457,9 +460,58 @@ export function makeServer({ environment = 'development' } = {}) {
 
       //? Add a new course
       this.post('/courses/add', (schema, request) => {
-        const newCourse = 'new student';
+        const requestBody = JSON.parse(request.requestBody);
+        const {
+          name,
+          uid,
+          cover,
+          detail,
+          duration,
+          maxStudents,
+          price,
+          startTime,
+          typeId,
+          durationUnit,
+          teacherId,
+        } = requestBody;
+
+        const process = schema.processes.create({
+          status: 0,
+          current: 0,
+          classTime: null,
+          chapters: null,
+        });
+        const sales = schema.sales.create({
+          batches: 0,
+          price,
+          earnings: 0,
+          paidAmount: 0,
+          studentAmount: 0,
+          paidIds: [],
+        });
+        const newCourse = schema.db.courses.insert({
+          name,
+          uid,
+          detail,
+          startTime,
+          price,
+          maxStudents,
+          sales,
+          process,
+          star: 0,
+          status: 0,
+          duration,
+          durationUnit,
+          cover,
+          teacherId,
+          typeId,
+          ctime: format(new Date(), 'yyyy-MM-dd hh:mm:ss'),
+        });
 
         if (newCourse) {
+          newCourse.typeName = schema.courseTypes.findBy({ id: typeId }).name;
+          newCourse.processId = +process.id;
+
           return new Response(
             201,
             {},
@@ -477,6 +529,46 @@ export function makeServer({ environment = 'development' } = {}) {
               code: 400,
               msg: 'create new course failed',
               data: false,
+            }
+          );
+        }
+      });
+
+      this.get('/courses/course-process', (schema, request) => {
+        const { id } = request.queryParams;
+        const data = schema.processes.findBy({ id });
+
+        return new Response(200, {}, { msg: 'success', code: 200, data });
+      });
+
+      this.post('/courses/course-process', (schema, request) => {
+        const body = JSON.parse(request.requestBody);
+        const { processId, courseId } = body;
+        let target;
+
+        if (processId || courseId) {
+          if (processId) {
+            target = schema.processes.findBy({ id: processId });
+          } else {
+            target = schema.courses.findBy({ id: courseId }).process;
+          }
+          const { classTime, chapters } = body;
+
+          target.update({
+            current: 0,
+            status: 0,
+            chapters: chapters.map((item, index) => ({ ...item, id: index })),
+            classTime,
+          });
+
+          return new Response(200, {}, { msg: 'success', code: 200, data: true });
+        } else {
+          return new Response(
+            400,
+            {},
+            {
+              msg: `can\'t find process by course ${courseId} or processId ${processId} `,
+              code: 400,
             }
           );
         }

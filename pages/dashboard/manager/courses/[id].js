@@ -6,7 +6,8 @@ import styled from 'styled-components';
 import WeeklyTimeTable from '../../../../components/WeeklyTimeTable';
 import Layout from '../../../../components/Layout';
 import CourseOverview from '../../../../components/CourseOverview';
-import { courseStatus, gutter } from '../../../../utilities/constant';
+import courseStatus from '../../../../utilities/constant/courseStatus';
+import gutter from '../../../../utilities/constant/gutter';
 import coursesApiCall from '../../../../api-service/courses';
 
 const { Title, Text } = Typography;

@@ -1,4 +1,4 @@
-export const validateMessages = {
+const validateMessages = {
   required: '${label} is required!',
   types: {
     email: '${label} is not a valid email!',
@@ -8,3 +8,5 @@ export const validateMessages = {
     range: '${label} must be between ${min} and ${max}',
   },
 };
+
+export default validateMessages;
