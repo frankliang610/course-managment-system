@@ -6,7 +6,6 @@ import {
   Row,
   Col,
   Button,
-  DatePicker,
   Input,
   InputNumber,
   message,
@@ -18,12 +17,13 @@ import {
 import { CloseCircleOutlined, InboxOutlined, KeyOutlined } from '@ant-design/icons';
 import TextArea from 'antd/lib/input/TextArea';
 import ImgCrop from 'antd-img-crop';
-import format from 'date-fns/fp/format';
-import getTime from 'date-fns/getTime';
+import { format, getTime } from 'date-fns';
 import styled from 'styled-components';
 import durationUnit from '../utilities/constant/duration';
 import gutter from '../utilities/constant/gutter';
 import validateMessages from '../utilities/constant/validateMessages';
+import InputNumberWithUnit from '../components/InputNumberWithUnit';
+import DatePicker from '../components/ReconfiguredDatePicker';
 
 const TextAreaWrapper = styled(Form.Item)`
   .ant-form-item-control {
@@ -49,6 +49,10 @@ const UploadWrapper = styled(Form.Item)`
     inset: 0;
     top: 37px;
     bottom: 30px;
+  }
+  .ant-upload-picture-card-wrapper,
+  .ant-form-item-control-input {
+    margin-right: 12px;
   }
   .ant-upload-picture-card-wrapper,
   .ant-form-item-control-input,
@@ -122,26 +126,12 @@ const AddCourseForm = ({ course, onSuccess }) => {
   const [isUploading, setUploading] = useState(false);
   const [isTeacherSearching, setTeacherSearching] = useState(false);
   const [teachers, setTeachers] = useState([]);
-  const [isCourseAdded, setCourseAdded] = useState(course === null);
+  const [isCourseAdded, setCourseAdded] = useState(false);
   const [preview, setPreview] = useState({
     previewTitle: '',
     previewVisible: false,
     previewImage: '',
   });
-
-  const suffixUnit = (
-    <Form.Item name="durationUnit" noStyle>
-      <Select defaultValue={durationUnit.month} style={{ width: 100 }}>
-        {Object.values(durationUnit).map((unit, index) => {
-          return (
-            <Select.Option key={index} value={unit}>
-              {unit}
-            </Select.Option>
-          );
-        })}
-      </Select>
-    </Form.Item>
-  );
 
   const uploadButton = (
     <UploadContent>
@@ -170,21 +160,23 @@ const AddCourseForm = ({ course, onSuccess }) => {
   };
 
   const onFinish = async (values) => {
-    // if (!isCourseAdded && !course) {
-    //   message.error('One course must be selected to update');
-    //   return;
-    // }
+    if (!isCourseAdded && course) {
+      message.error('One course must be selected to update');
+      return;
+    }
 
+    const { cover, startTime, duration, typeId, teacherId } = values;
     const newCourse = {
       ...values,
-      duration: +values.duration.number,
-      typeId: +values.typeId,
-      startTime: '2021-01-01', // Error invalid time value, tried parse() and parseISO()
-      teacherId: +values.teacherId || +course.teacherId,
-      durationUnit: +values.duration.unit,
+      cover,
+      duration: +duration.number,
+      typeId: +typeId,
+      startTime: format(startTime, 'yyy-MM-dd'), // Error invalid time value, tried parse() and parseISO()
+      teacherId: +teacherId || +course.teacherId,
+      durationUnit: duration.unit,
     };
 
-    const response = isCourseAdded
+    const response = !isCourseAdded
       ? coursesApiCall.addCourse(newCourse)
       : coursesApiCall.updateCourse({
           ...newCourse,
@@ -192,13 +184,13 @@ const AddCourseForm = ({ course, onSuccess }) => {
         });
     const { data } = await response;
 
-    if (data && !course) setCourseAdded(false);
+    if (data && !course) setCourseAdded(true);
 
     if (onSuccess && data) onSuccess(data);
   };
 
   useEffect(() => {
-    if (isCourseAdded) getCourseCode();
+    if (!isCourseAdded) getCourseCode();
 
     coursesApiCall.getCourseTypes().then((res) => {
       setCourseTypes(res.data);
@@ -210,7 +202,7 @@ const AddCourseForm = ({ course, onSuccess }) => {
       const data = {
         ...course,
         typeId: String(course.typeId),
-        teacherId: course.teacherName,
+        teacherId: course.teacher,
         startTime: course.startTime,
         duration: {
           number: course.duration,
@@ -224,6 +216,7 @@ const AddCourseForm = ({ course, onSuccess }) => {
           url: course.cover,
         },
       ]);
+      setCourseAdded(true);
     }
   }, [course]);
 
@@ -236,6 +229,9 @@ const AddCourseForm = ({ course, onSuccess }) => {
         layout="vertical"
         validateMessages={validateMessages}
         onFinish={onFinish}
+        initialValues={{
+          ['durationUnit']: durationUnit.month,
+        }}
       >
         <Row gutter={gutter}>
           <Col span={8}>
@@ -318,14 +314,14 @@ const AddCourseForm = ({ course, onSuccess }) => {
         <Row gutter={gutter}>
           <Col span={8}>
             <Form.Item label="Start Date" name="startTime">
-              {/* <DatePicker
+              <DatePicker
                 style={{ width: '100%' }}
                 disabledDate={(passedDate) => {
                   const today = getTime(new Date());
                   const date = passedDate.valueOf();
                   return date < today;
                 }}
-              /> */}
+              />
             </Form.Item>
 
             <Form.Item label="Price" name="price" rules={[{ required: true }]}>
@@ -346,7 +342,13 @@ const AddCourseForm = ({ course, onSuccess }) => {
               name="duration"
               rules={[{ required: true }, { validator: validateDuration }]}
             >
-              <Input type="number" addonAfter={suffixUnit} />
+              <InputNumberWithUnit
+                options={Object.values(durationUnit).map((item, index) => ({
+                  unit: index + 1,
+                  label: durationUnit[item],
+                }))}
+                defaultUnit={durationUnit.month}
+              />
             </Form.Item>
           </Col>
 
@@ -372,10 +374,10 @@ const AddCourseForm = ({ course, onSuccess }) => {
                   fileList={fileList}
                   onPreview={handlePreview}
                   onChange={({ fileList, file }) => {
-                    if (file?.response) {
+                    if (file.response) {
                       form.setFieldsValue({ cover: file.response.url });
                     } else {
-                      form.setFieldsValue({ cover: course?.cover || '' });
+                      form.setFieldsValue({ cover: course?.cover ?? '' });
                     }
 
                     setUploading(file.status === 'uploading');
@@ -401,7 +403,7 @@ const AddCourseForm = ({ course, onSuccess }) => {
           <Col span={8}>
             <Form.Item>
               <Button type="primary" htmlType="submit" disabled={isUploading}>
-                {isCourseAdded ? 'Create Course' : 'Update Course'}
+                {isCourseAdded ? 'Update Course' : 'Create Course'}
               </Button>
             </Form.Item>
           </Col>

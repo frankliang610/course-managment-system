@@ -58,7 +58,7 @@ export const getServerSideProps = async (context) => {
 };
 
 const getChapterSteps = (source, index) => {
-  const currentStepIndex = source.chapters.findIndex((c) => c.id === source.current);
+  const currentStepIndex = source.chapters?.findIndex((c) => c.id === source.current);
 
   if (index === currentStepIndex) {
     return <Tag color={'green'}>Ongoing</Tag>;
@@ -79,7 +79,7 @@ const Course = ({ id }) => {
   useEffect(() => {
     (async () => {
       const { data } = await coursesApiCall.getCourseById(courseId);
-      const currentStepIndex = data.schedule.chapters.findIndex(
+      const currentStepIndex = data.schedule.chapters?.findIndex(
         (c) => c.id === data.schedule.current
       );
 
@@ -134,7 +134,7 @@ const Course = ({ id }) => {
                 </Badge>
                 <Row>
                   <Steps size="small" current={currentChapterIndex}>
-                    {data.schedule.chapters.map((c) => (
+                    {data.schedule.chapters?.map((c) => (
                       <Steps.Step title={c.name} key={c.id} />
                     ))}
                   </Steps>
@@ -163,7 +163,7 @@ const Course = ({ id }) => {
                   defaultActiveKey={data.schedule.current}
                   expandIcon={({ isActive }) => <CaretRightOutlined rotate={isActive ? 90 : 0} />}
                 >
-                  {data.schedule.chapters.map((sc, index) => (
+                  {data.schedule.chapters?.map((sc, index) => (
                     <Collapse.Panel
                       header={sc.name}
                       key={sc.id}

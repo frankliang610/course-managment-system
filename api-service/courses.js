@@ -33,6 +33,11 @@ const updateCourseProcess = async (updateCourseProcess) =>
     .postRequest([rootPaths.courses, subPaths.courseProcess], updateCourseProcess)
     .then((res) => showResponseMessage(res));
 
+const getProcessById = async (processId) =>
+  await axiosClient
+    .getRequest([rootPaths.courses, subPaths.courseProcess], { id: processId })
+    .then((res) => showResponseMessage(res));
+
 const getTeachers = async (params) =>
   await axiosClient.getRequest([rootPaths.courses, subPaths.courseTeachers], params);
 
@@ -44,5 +49,6 @@ export default {
   getCourseTypes,
   createCourseCode,
   updateCourseProcess,
+  getProcessById,
   getTeachers,
 };

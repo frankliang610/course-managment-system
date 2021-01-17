@@ -475,11 +475,12 @@ export function makeServer({ environment = 'development' } = {}) {
           teacherId,
         } = requestBody;
 
-        const process = schema.processes.create({
+        const schedule = schema.schedules.create({
+          id: parseInt(schema.schedules.all().length + 1),
           status: 0,
           current: 0,
-          classTime: null,
-          chapters: null,
+          classTime: [],
+          chapters: [],
         });
         const sales = schema.sales.create({
           batches: 0,
@@ -489,7 +490,12 @@ export function makeServer({ environment = 'development' } = {}) {
           studentAmount: 0,
           paidIds: [],
         });
+
+        const currentCourseIds = schema.db.courses.map((c) => c.id);
+        const currentCourseMaxId = Math.max(...currentCourseIds);
+        const newCourseId = currentCourseMaxId + 1;
         const newCourse = schema.db.courses.insert({
+          id: newCourseId,
           name,
           uid,
           detail,
@@ -497,7 +503,7 @@ export function makeServer({ environment = 'development' } = {}) {
           price,
           maxStudents,
           sales,
-          process,
+          schedule,
           star: 0,
           status: 0,
           duration,
@@ -510,7 +516,7 @@ export function makeServer({ environment = 'development' } = {}) {
 
         if (newCourse) {
           newCourse.typeName = schema.courseTypes.findBy({ id: typeId }).name;
-          newCourse.processId = +process.id;
+          newCourse.scheduleId = +schedule.id;
 
           return new Response(
             201,
@@ -536,7 +542,7 @@ export function makeServer({ environment = 'development' } = {}) {
 
       this.get('/courses/course-process', (schema, request) => {
         const { id } = request.queryParams;
-        const data = schema.processes.findBy({ id });
+        const data = schema.schedules.findBy({ id });
 
         return new Response(200, {}, { msg: 'success', code: 200, data });
       });
@@ -548,9 +554,9 @@ export function makeServer({ environment = 'development' } = {}) {
 
         if (processId || courseId) {
           if (processId) {
-            target = schema.processes.findBy({ id: processId });
+            target = schema.schedules.findBy({ id: processId });
           } else {
-            target = schema.courses.findBy({ id: courseId }).process;
+            target = schema.courses.findBy({ id: courseId }).schedule;
           }
           const { classTime, chapters } = body;
 
@@ -604,6 +610,15 @@ export function makeServer({ environment = 'development' } = {}) {
 
       this.post('https://www.mocky.io/v2/5cc8019d300000980a055e76', (schema, request) => {
         console.log('Image uploaded');
+        return new Response(
+          201,
+          {},
+          {
+            code: 201,
+            msg: `image uploaded`,
+            data: { url: 'this/is/the/img/url' },
+          }
+        );
       });
     },
   });

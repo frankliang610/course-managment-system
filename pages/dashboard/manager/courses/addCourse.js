@@ -15,7 +15,6 @@ const AddCourse = () => {
   const [course, setCourse] = useState(null);
   const [courseId, setCourseId] = useState(0);
   const [scheduleId, setScheduleId] = useState(0);
-  const [processId, setProcessId] = useState(0);
   const [navigate, setNavigate] = useState([0]);
   const next = () => {
     setStep(step + 1);
@@ -28,15 +27,14 @@ const AddCourse = () => {
         setCourse(course);
         setCourseId(course.id);
         setScheduleId(course.scheduleId);
-        setProcessId(course.processId);
         next();
       }}
       course={course}
     />,
     <AddChapterDetailForm
+      course={course}
       courseId={courseId}
       scheduleId={scheduleId}
-      processId={processId}
       onSuccess={next}
     />,
     <Result
