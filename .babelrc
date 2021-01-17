@@ -5,7 +5,7 @@
       "import",
       {
         "libraryName": "antd",
-        "style": "index.css"
+        "style": false
       }
     ],
     ["styled-components", { "ssr": true, "displayName": true }]

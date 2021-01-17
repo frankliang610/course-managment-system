@@ -1,6 +1,6 @@
 import React from 'react';
 import { makeServer } from '../mock-server/mirage';
-import '../styles/antd.css';
+import '../styles/globals.less';
 
 makeServer({ environment: 'development' });
 
