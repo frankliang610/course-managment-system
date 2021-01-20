@@ -203,7 +203,7 @@ const AddCourseForm = ({ course, onSuccess }) => {
         ...course,
         typeId: String(course.typeId),
         teacherId: course.teacher,
-        startTime: course.startTime,
+        startTime: new Date(course.startTime),
         duration: {
           number: course.duration,
           unit: course.durationUnit,

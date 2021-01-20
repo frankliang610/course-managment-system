@@ -64,7 +64,11 @@ export function makeServer({ environment = 'development' } = {}) {
 
     routes() {
       this.passthrough((request) => {
-        if (request.url === '/_next/static/development/_devPagesManifest.json') return true;
+        if (
+          request.url === '/_next/static/development/_devPagesManifest.json' ||
+          request.url.includes('mocky.io')
+        )
+          return true;
       });
 
       this.namespace = '/api';
@@ -606,19 +610,6 @@ export function makeServer({ environment = 'development' } = {}) {
             }
           );
         }
-      });
-
-      this.post('https://www.mocky.io/v2/5cc8019d300000980a055e76', (schema, request) => {
-        console.log('Image uploaded');
-        return new Response(
-          201,
-          {},
-          {
-            code: 201,
-            msg: `image uploaded`,
-            data: { url: 'this/is/the/img/url' },
-          }
-        );
       });
     },
   });

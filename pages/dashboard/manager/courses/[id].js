@@ -79,7 +79,7 @@ const Course = ({ id }) => {
   useEffect(() => {
     (async () => {
       const { data } = await coursesApiCall.getCourseById(courseId);
-      const currentStepIndex = data.schedule.chapters?.findIndex(
+      const currentStepIndex = data.schedule?.chapters?.findIndex(
         (c) => c.id === data.schedule.current
       );
 
