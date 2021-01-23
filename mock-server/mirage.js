@@ -1,5 +1,7 @@
 import { inflections } from 'inflected';
 import { createServer, Model, belongsTo, hasMany, Response } from 'miragejs';
+import { countBy, groupBy } from 'lodash';
+import getStatisticsDataHelper from './helper/getStatisticsDataHelper';
 import studentsData from './student.json';
 import usersData from './user.json';
 import courseTypesData from './course_type.json';
@@ -8,10 +10,12 @@ import studentTypesData from './student_type.json';
 import studentCoursesData from './student_course.json';
 import studentProfileData from './student-profile.json';
 import teachersData from './teacher.json';
+import teacherProfileData from './teacher-profile.json';
 import scheduleData from './schedule.json';
 import salesData from './sales.json';
 import processData from './process.json';
 import format from 'date-fns/format';
+import subMonths from 'date-fns/subMonths';
 
 export function makeServer({ environment = 'development' } = {}) {
   inflections('en', function (inflect) {
@@ -27,7 +31,7 @@ export function makeServer({ environment = 'development' } = {}) {
       student: Model.extend({
         studentCourses: hasMany(),
         type: belongsTo('studentType'),
-        profile: belongsTo(),
+        profile: belongsTo('studentProfile'),
       }),
       courseType: Model,
       course: Model.extend({
@@ -39,26 +43,31 @@ export function makeServer({ environment = 'development' } = {}) {
       studentCourse: Model.extend({
         course: belongsTo(),
       }),
-      profile: Model.extend({
+      studentProfile: Model.extend({
         studentCourses: hasMany(),
+        type: belongsTo('studentType'),
       }),
-      teacher: Model,
+      teacherProfile: Model,
+      teacher: Model.extend({
+        profile: belongsTo('teacherProfile'),
+      }),
       schedule: Model,
       sales: Model,
       process: Model,
     },
 
     seeds(server) {
+      usersData.forEach((user) => server.create('user', user));
+      teacherProfileData.forEach((teacher) => server.create('teacherProfile', teacher));
       teachersData.forEach((teacher) => server.create('teacher', teacher));
       courseTypesData.forEach((type) => server.create('courseType', type));
       scheduleData.forEach((schedule) => server.create('schedule', schedule));
       salesData.forEach((sales) => server.create('sales', sales));
       processData.forEach((process) => server.create('process', process));
       coursesData.forEach((course) => server.create('course', course));
-      usersData.forEach((user) => server.create('user', user));
       studentTypesData.forEach((type) => server.create('studentType', type));
       studentCoursesData.forEach((course) => server.create('studentCourse', course));
-      studentProfileData.forEach((student) => server.create('profile', student));
+      studentProfileData.forEach((student) => server.create('studentProfile', student));
       studentsData.forEach((student) => server.create('student', student));
     },
 
@@ -66,7 +75,8 @@ export function makeServer({ environment = 'development' } = {}) {
       this.passthrough((request) => {
         if (
           request.url === '/_next/static/development/_devPagesManifest.json' ||
-          request.url.includes('mocky.io')
+          request.url.includes('mocky.io') ||
+          request.url.includes('highcharts')
         )
           return true;
       });
@@ -610,6 +620,113 @@ export function makeServer({ environment = 'development' } = {}) {
             }
           );
         }
+      });
+
+      //? Get general overview
+      this.get('/statistics/overview', (schema, _) => {
+        const courses = schema.courses.all().models;
+        const data = {
+          student: getStatisticsDataHelper.getPeople(schema, 'students'),
+          teacher: getStatisticsDataHelper.getPeople(schema, 'teachers'),
+          course: {
+            total: courses.length,
+            lastMonthAdded: schema.courses.where(
+              (item) => new Date(item.ctime) >= subMonths(new Date(), 1)
+            ).models.length,
+          },
+        };
+
+        return new Response(200, {}, { msg: 'success', code: 200, data });
+      });
+
+      this.get('/statistics/student', (schema, _) => {
+        const source = schema.students.all().models;
+        const data = {
+          area: getStatisticsDataHelper.getList(countBy(source, 'area')),
+          typeName: getStatisticsDataHelper.getList(countBy(source, (item) => item.type.name)),
+          courses: getStatisticsDataHelper.getList(
+            source.reduce((acc, item) => {
+              const courses = item.studentCourses.models.map((item) => item.course.name);
+              const accumulate = getStatisticsDataHelper.accumulateFactory(acc);
+
+              courses.forEach(accumulate);
+              return acc;
+            }, {})
+          ),
+          ctime: getStatisticsDataHelper.getCourseCreatedTime(source),
+          interest: getStatisticsDataHelper.getList(
+            source
+              .map((item) => item.profile?.attrs?.interest ?? [])
+              .reduce((acc, cur) => {
+                const accumulate = getStatisticsDataHelper.accumulateFactory(acc);
+
+                cur.forEach(accumulate);
+                return acc;
+              }, {})
+          ),
+        };
+
+        return new Response(200, {}, { msg: 'success', code: 200, data });
+      });
+
+      this.get('/statistics/teacher', (schema, _) => {
+        const source = schema.teachers.all().models;
+        const data = {
+          country: getStatisticsDataHelper.getList(countBy(source, 'country')),
+          skills: source.reduce((acc, cur) => {
+            cur.skills.forEach((skill) => {
+              const { name, level } = skill;
+
+              if (acc.hasOwnProperty(name)) {
+                const target = acc[name].find((item) => item.level === level);
+
+                if (target) {
+                  target.amount = target.amount + 1;
+                } else {
+                  acc[name].push({ name: 'level', level, amount: 1 });
+                }
+              } else {
+                acc[name] = [{ name: 'level', level, amount: 1 }];
+              }
+            });
+            return acc;
+          }, {}),
+          workExperience: source.map((teacher) => {
+            const workingYears = getStatisticsDataHelper.getCourseDuration(
+              teacher.profile.workExperience
+            );
+
+            return workingYears;
+          }),
+          ctime: getStatisticsDataHelper.getCourseCreatedTime(source),
+        };
+
+        return new Response(200, {}, { msg: 'success', code: 200, data });
+      });
+
+      this.get('/statistics/course', (schema, _) => {
+        const source = schema.courses.all().models;
+        const data = {
+          typeName: getStatisticsDataHelper.getList(countBy(source, (item) => item.type.name)),
+          ctime: getStatisticsDataHelper.getCourseCreatedTime(source),
+          classTime: Object.entries(
+            groupBy(
+              source.map((course) => {
+                const classTime = course.schedule.classTime;
+                const typeName = course.type.name;
+
+                return { classTime, typeName, name: course.name };
+              }),
+              (item) => item.typeName
+            )
+          ).map(([name, values]) => ({
+            name,
+            amount: values.length,
+            courses: values,
+          })),
+        };
+
+        return new Response(200, {}, { msg: 'success', code: 200, data });
       });
     },
   });

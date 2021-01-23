@@ -28,6 +28,7 @@ export const StyledContent = styled(Content)`
   background-color: #fff;
   padding: 16px;
   min-height: auto;
+  overflow-x: auto;
 `;
 
 export const StyledBrandIcon = styled.div`

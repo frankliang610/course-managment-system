@@ -5,6 +5,7 @@ export const rootPaths = {
   students: 'students',
   course: 'course',
   courses: 'courses',
+  statistics: 'statistics',
 };
 
 export const subPaths = {
@@ -16,6 +17,13 @@ export const subPaths = {
   courseTypes: 'course-types',
   courseTeachers: 'course-teachers',
   courseProcess: 'course-process',
+  overview: 'overview',
+};
+
+export const statisticsType = {
+  student: 'student',
+  teacher: 'teacher',
+  course: 'course',
 };
 
 export const apiPathsGenerator = (paths, params) => {
