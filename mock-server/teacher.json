@@ -21,7 +21,7 @@
     "courseAmount": 9,
     "profileId": 1,
     "email": "xxx@a.com",
-    "ctime": "2020-11-11",
+    "createdAt": "2020-11-11",
     "updateAt": "2020-11-12"
   },
   {
@@ -46,7 +46,7 @@
     "courseAmount": 9,
     "profileId": 1,
     "email": "xxx@a.com",
-    "ctime": "2020-11-11",
+    "createdAt": "2020-11-11",
     "updateAt": "2020-11-13"
   },
   {
@@ -71,7 +71,7 @@
     "courseAmount": 9,
     "profileId": 1,
     "email": "xxx@a.com",
-    "ctime": "2020-11-11",
+    "createdAt": "2020-11-11",
     "updateAt": "2020-11-18"
   },
   {
@@ -96,7 +96,7 @@
     "courseAmount": 9,
     "profileId": 1,
     "email": "xxx@a.com",
-    "ctime": "2020-11-11",
+    "createdAt": "2020-11-11",
     "updateAt": "2020-11-15"
   }
 ]

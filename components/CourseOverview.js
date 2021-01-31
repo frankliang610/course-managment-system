@@ -27,7 +27,7 @@ const getDurationText = (duration, unit) => {
 };
 
 const CourseOverview = ({ data, children, cardProp }) => {
-  const { cover, duration, durationUnit, name, startTime, star, teacher, maxStudents } = data;
+  const { cover, duration, durationUnit, name, startTime, star, teacherName, maxStudents } = data;
   return (
     <Card cover={<img src={cover} />} {...cardProp}>
       <Row gutter={gutter}>
@@ -51,7 +51,7 @@ const CourseOverview = ({ data, children, cardProp }) => {
 
       <StyledRow gutter={gutter} justify="space-between">
         <Col>Teacher:</Col>
-        <Col style={{ fontWeight: 'bold' }}>{teacher}</Col>
+        <Col style={{ fontWeight: 'bold' }}>{teacherName}</Col>
       </StyledRow>
 
       <StyledRow gutter={gutter} justify="space-between">

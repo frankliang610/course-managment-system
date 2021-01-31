@@ -16,8 +16,8 @@ const LoginPage = () => {
   const login = async (values) => {
     const response = await authApiCall.login({ ...values, userRole });
     if (response.data) {
-      setUserInfo(response.data);
-      router.push(`/dashboard/${response.data.loginType}`);
+      setUserInfo(response?.data);
+      router.push(`/dashboard/${response.data.role}`);
     }
   };
 

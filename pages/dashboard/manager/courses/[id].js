@@ -74,7 +74,7 @@ const Course = ({ id }) => {
   const courseId = +router.query.id || id;
   const [courseBrief, setCourseBrief] = useState([]);
   const [currentChapterIndex, setCurrentChapterIndex] = useState(0);
-  const [data, setData] = useState(null);
+  const [data, setData] = useState({});
 
   useEffect(() => {
     (async () => {
@@ -124,7 +124,7 @@ const Course = ({ id }) => {
                 <StyledTitle level={2}>Course Detail</StyledTitle>
 
                 <StyledSubTitle level={3}>Create Time</StyledSubTitle>
-                <Row>{data.ctime}</Row>
+                <Row>{data.createdAt}</Row>
 
                 <StyledSubTitle level={3}>Start Time</StyledSubTitle>
                 <Row>{data.startTime}</Row>
@@ -134,7 +134,7 @@ const Course = ({ id }) => {
                 </Badge>
                 <Row>
                   <Steps size="small" current={currentChapterIndex}>
-                    {data.schedule.chapters?.map((c) => (
+                    {data.schedule?.chapters?.map((c) => (
                       <Steps.Step title={c.name} key={c.id} />
                     ))}
                   </Steps>
@@ -144,7 +144,7 @@ const Course = ({ id }) => {
                 <Row>{data.uid}</Row>
 
                 <StyledSubTitle level={3}>Class Time</StyledSubTitle>
-                <WeeklyTimeTable data={data.schedule.classTime} />
+                <WeeklyTimeTable data={data.schedule?.classTime} />
 
                 <StyledSubTitle level={3}>Category</StyledSubTitle>
                 <Row>
@@ -160,10 +160,10 @@ const Course = ({ id }) => {
 
                 <StyledSubTitle level={3}>Chapter</StyledSubTitle>
                 <Collapse
-                  defaultActiveKey={data.schedule.current}
+                  defaultActiveKey={data.schedule?.current}
                   expandIcon={({ isActive }) => <CaretRightOutlined rotate={isActive ? 90 : 0} />}
                 >
-                  {data.schedule.chapters?.map((sc, index) => (
+                  {data.schedule?.chapters?.map((sc, index) => (
                     <Collapse.Panel
                       header={sc.name}
                       key={sc.id}

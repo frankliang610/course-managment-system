@@ -13,10 +13,10 @@ export const subPaths = {
   update: 'update',
   delete: 'delete',
   detail: 'detail',
-  generateCode: 'generate-code',
-  courseTypes: 'course-types',
+  generateCode: 'code',
+  courseTypes: 'type',
   courseTeachers: 'course-teachers',
-  courseProcess: 'course-process',
+  courseProcess: 'schedule',
   overview: 'overview',
 };
 

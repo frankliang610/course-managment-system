@@ -1,24 +1,31 @@
 import { useRouter } from 'next/router';
-const KEY = 'user';
+
+const KEY = 'cms';
 
 export const getUserInfo = () => {
-  const router = useRouter();
-  let userType = '';
-
-  if (typeof window !== 'undefined') {
-    const storedLoginInfo = localStorage.getItem(KEY);
-    userType = JSON.parse(storedLoginInfo).type;
+  try {
+    if (typeof window !== 'undefined') {
+      return JSON.parse(localStorage.getItem(KEY));
+    }
+  } catch (error) {
+    return null;
   }
+};
 
-  if (!userType) {
-    userType = router.pathname.split('/')[2];
-  }
+export const getToken = () => {
+  const userInfo = getUserInfo();
+  const token = userInfo?.token;
+  return token;
+};
 
-  return userType;
+export const getUserRole = () => {
+  const userInfo = getUserInfo();
+  const role = userInfo?.role;
+  return role;
 };
 
 export const setUserInfo = (info) => {
-  localStorage.setItem('user', JSON.stringify(info));
+  localStorage.setItem('cms', JSON.stringify(info));
 };
 
 export const deleteUserInfo = () => {

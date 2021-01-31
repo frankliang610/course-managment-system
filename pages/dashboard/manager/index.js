@@ -25,7 +25,6 @@ const OverviewPage = () => {
   const [courseStatistics, setCourseStatistics] = useState([]);
   const [distributionRole, setDistributionRole] = useState(Role.student);
   const [selectedType, setSelectedType] = useState('studentType');
-
   useEffect(() => {
     overviewApiCall.getStatisticsOverview().then((res) => {
       setOverview(res.data);
@@ -91,7 +90,7 @@ const OverviewPage = () => {
             <DistributionWithoutSSR
               data={
                 distributionRole === Role.student
-                  ? studentStatistics?.area
+                  ? studentStatistics?.country
                   : teacherStatistics?.country
               }
               title={distributionRole}
@@ -111,9 +110,9 @@ const OverviewPage = () => {
             }
           >
             {selectedType === 'studentType' ? (
-              <PieChart data={studentStatistics?.typeName} title={selectedType} />
+              <PieChart data={studentStatistics?.type} title={selectedType} />
             ) : selectedType === 'courseType' ? (
-              <PieChart data={courseStatistics?.typeName} title={selectedType} />
+              <PieChart data={courseStatistics?.type} title={selectedType} />
             ) : (
               <Row gutter={16}>
                 <Col span={12}>
@@ -146,9 +145,9 @@ const OverviewPage = () => {
           <Card title="Increment">
             <LineChart
               data={{
-                [Role.student]: studentStatistics?.ctime,
-                [Role.teacher]: teacherStatistics?.ctime,
-                course: courseStatistics?.ctime,
+                [Role.student]: studentStatistics?.createdAt,
+                [Role.teacher]: teacherStatistics?.createdAt,
+                course: courseStatistics?.createdAt,
               }}
             />
           </Card>

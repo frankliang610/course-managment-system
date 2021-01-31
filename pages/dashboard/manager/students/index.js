@@ -207,8 +207,8 @@ const StudentsList = () => {
     },
     {
       title: 'Join Time',
-      dataIndex: 'ctime',
-      key: 'ctime',
+      dataIndex: 'createdAt',
+      key: 'createdAt',
       render: (value, record) => formatDistanceToNow(new Date(value), { addSuffix: true }),
     },
     {

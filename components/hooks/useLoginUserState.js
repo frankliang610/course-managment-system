@@ -1,29 +1,29 @@
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
-import { getUserInfo } from '../../utilities/loginUserInfo';
+import { getUserInfo, getUserRole } from '../../utilities/loginUserInfo';
 
 export const useLoginUserState = () => {
   const router = useRouter();
-  const { loginType, token } = getUserInfo();
+  const { role, token } = getUserInfo();
 
   useEffect(() => {
     if (!token) {
       router.push('/login', undefined, { shallow: true });
     }
 
-    if (loginType) {
-      router.push(`/dashboard/${loginType}`, undefined, { shallow: true });
+    if (role) {
+      router.push(`/dashboard/${role}`, undefined, { shallow: true });
     }
   }, []);
 
   return {
-    loginType,
+    role,
     token,
   };
 };
 
 export const useUserType = () => {
-  const loginType = getUserInfo();
+  const role = getUserRole();
 
-  return loginType;
+  return role;
 };

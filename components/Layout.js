@@ -22,9 +22,9 @@ const { Sider } = Layout;
 
 const CustomisedLayout = ({ children }) => {
   const router = useRouter();
-  const userType = getUserInfo();
+  const userRole = getUserInfo()?.role;
   const [collapsed, setCollapsed] = useState(false);
-  const sideNav = routes[userType];
+  const sideNav = routes[userRole];
   const toggle = () => setCollapsed(!collapsed);
   const onCollapse = (collapsed) => setCollapsed(collapsed);
   const logOut = async () => {

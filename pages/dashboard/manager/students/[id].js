@@ -10,7 +10,7 @@ import {
   StyledText,
   StyledTag,
 } from '../../../../styles/StyledStudentDetailComponent';
-import { gutter } from '../../../../utilities/constant';
+import gutter from '../../../../utilities/constant/gutter';
 
 export const getServerSideProps = async (context) => {
   const { id } = context.params;
@@ -66,7 +66,7 @@ const Student = ({ id }) => {
           { label: 'Gender', value: data.gender === 1 ? 'Male' : 'Female' },
           { label: 'Member Period', value: data.memberStartAt + ' - ' + data.memberEndAt },
           { label: 'Type', value: data.typeName },
-          { label: 'Create Time', value: data.ctime },
+          { label: 'Create Time', value: data.createdAt },
           { label: 'Update Time', value: data.updateAt },
         ]);
         setLoading(false);
@@ -94,8 +94,8 @@ const Student = ({ id }) => {
     },
     {
       title: 'Join Time',
-      dataIndex: 'ctime',
-      key: 'ctime',
+      dataIndex: 'createdAt',
+      key: 'createdAt',
     },
   ];
 

@@ -9,7 +9,7 @@ const getPeople = (schema, type) => {
   return {
     total: all.length,
     lastMonthAdded: schema.teachers.where(
-      (item) => new Date(item.ctime) >= subMonths(new Date(), 1)
+      (item) => new Date(item.createdAt) >= subMonths(new Date(), 1)
     ).models.length,
     gender: { male, female, unknown: all.length - male - female },
   };
@@ -35,9 +35,9 @@ const getCourseDuration = (data, key = 'startEnd') => {
 const getCourseCreatedTime = (source) => {
   return getList(
     countBy(source, (item) => {
-      const index = item.ctime.lastIndexOf('-');
+      const index = item.createdAt.lastIndexOf('-');
 
-      return item.ctime.slice(0, index);
+      return item.createdAt.slice(0, index);
     })
   );
 };

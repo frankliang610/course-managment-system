@@ -4,13 +4,13 @@ import { Button, Result, Steps } from 'antd';
 import Layout from '../../../../components/Layout';
 import AddCourseDetailForm from '../../../../components/AddCourseForm';
 import AddChapterDetailForm from '../../../../components/AddChapterDetailForm';
-import { getUserInfo } from '../../../../utilities/loginUserInfo';
+import { getUserRole } from '../../../../utilities/loginUserInfo';
 
 const { Step } = Steps;
 
 const AddCourse = () => {
   const router = useRouter();
-  const userRole = getUserInfo();
+  const userRole = getUserRole();
   const [step, setStep] = useState(0);
   const [course, setCourse] = useState(null);
   const [courseId, setCourseId] = useState(0);

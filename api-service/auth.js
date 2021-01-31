@@ -1,17 +1,19 @@
 import axiosClient from './baseAxiosClient';
+import { AES } from 'crypto-js';
 import { rootPaths } from './apiPathsGenerator';
 import formattedResponse from './formattedResponse';
 
 const { showResponseMessage } = formattedResponse;
 
-const login = async (data) =>
-  await axiosClient
-    .getRequest(rootPaths.login, {
-      loginType: data.userRole,
+const login = async (data) => {
+  return await axiosClient
+    .postRequest(rootPaths.login, {
+      role: data.userRole,
       email: data.email,
-      password: data.password,
+      password: AES.encrypt(data.password, 'cms').toString(),
     })
-    .then((res) => showResponseMessage(res));
+    .then((res) => res);
+};
 
 const logout = async () => await axiosClient.postRequest(rootPaths.logout);
 

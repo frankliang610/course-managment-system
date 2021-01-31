@@ -4,7 +4,7 @@
     "name": "admin",
     "typeId": 2,
     "area": "New Zealand",
-    "ctime": "2020-06-19 15:29:58",
+    "createdAt": "2020-06-19 15:29:58",
     "email": "student@admin.com",
     "updateAt": "2020-12-01 13:22: 03",
     "studentCourseIds": [10, 11, 12, 21],
@@ -15,7 +15,7 @@
     "name": "铁憨憨",
     "typeId": 2,
     "area": "New Zealand",
-    "ctime": "2020-06-19 15:29:58",
+    "createdAt": "2020-06-19 15:29:58",
     "email": "tiehaha@admin.com",
     "updateAt": "2020-12-01 13:22: 03",
     "studentCourseIds": [24, 40, 42],
@@ -26,7 +26,7 @@
     "name": "green",
     "typeId": 2,
     "area": "Canada",
-    "ctime": "2020-06-19 15:29:58",
+    "createdAt": "2020-06-19 15:29:58",
     "email": "green@green.com",
     "updateAt": "2020-12-01 13:22: 03",
     "studentCourseIds": [49, 50]
@@ -36,7 +36,7 @@
     "name": "zaaa",
     "typeId": 2,
     "area": "China",
-    "ctime": "2020-06-19 15:29:58",
+    "createdAt": "2020-06-19 15:29:58",
     "email": "zaaa@admin.com",
     "updateAt": "2020-12-01 13:22: 03",
     "studentCourseIds": []
@@ -46,7 +46,7 @@
     "name": "admin1",
     "typeId": 2,
     "area": "Canada",
-    "ctime": "2020-06-28 16:06:41",
+    "createdAt": "2020-06-28 16:06:41",
     "email": "admin1@admin.com",
     "updateAt": "2020-12-01 13:22: 03",
     "studentCourseIds": []
@@ -56,7 +56,7 @@
     "name": "abcde",
     "typeId": 1,
     "area": "Australia",
-    "ctime": "2020-07-05 13:29:41",
+    "createdAt": "2020-07-05 13:29:41",
     "email": "323@sd",
     "updateAt": "2020-12-01 13:22: 03",
     "studentCourseIds": []
@@ -66,7 +66,7 @@
     "name": "admin14454",
     "typeId": 1,
     "area": "Sweden",
-    "ctime": "2020-07-05 13:43:22",
+    "createdAt": "2020-07-05 13:43:22",
     "email": "3@gmail.com",
     "updateAt": "2020-12-01 13:22: 03",
     "studentCourseIds": []
@@ -76,7 +76,7 @@
     "name": "2",
     "typeId": 1,
     "area": "Australia",
-    "ctime": "2020-07-06 20:03:22",
+    "createdAt": "2020-07-06 20:03:22",
     "email": "12@d",
     "updateAt": "2020-12-01 13:22: 03",
     "studentCourseIds": []
@@ -86,7 +86,7 @@
     "name": "fdf",
     "typeId": 2,
     "area": "China",
-    "ctime": "2020-07-06 20:04:23",
+    "createdAt": "2020-07-06 20:04:23",
     "email": "323@323fd",
     "updateAt": "2020-12-01 13:22: 03",
     "studentCourseIds": []
@@ -96,7 +96,7 @@
     "name": "haha",
     "typeId": 1,
     "area": "America",
-    "ctime": "2020-07-07 19:09:53",
+    "createdAt": "2020-07-07 19:09:53",
     "email": "12@sds",
     "updateAt": "2020-12-01 13:22: 03",
     "studentCourseIds": []
@@ -106,7 +106,7 @@
     "name": "dsd",
     "typeId": 1,
     "area": "Australia",
-    "ctime": "2020-07-08 19:42:11",
+    "createdAt": "2020-07-08 19:42:11",
     "email": "sd@sdsd",
     "updateAt": "2020-12-01 13:22: 03",
     "studentCourseIds": []
@@ -116,7 +116,7 @@
     "name": "323",
     "typeId": 2,
     "area": "China",
-    "ctime": "2020-07-14 18:47:54",
+    "createdAt": "2020-07-14 18:47:54",
     "email": "323@232",
     "updateAt": "2020-12-01 13:22: 03",
     "studentCourseIds": []
@@ -126,7 +126,7 @@
     "name": "Tramp",
     "typeId": 1,
     "area": "Australia",
-    "ctime": "2020-07-23 19:53:06",
+    "createdAt": "2020-07-23 19:53:06",
     "email": "2@sad.com",
     "updateAt": "2020-12-01 13:22: 03",
     "studentCourseIds": []

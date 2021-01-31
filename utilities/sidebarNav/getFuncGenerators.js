@@ -44,10 +44,10 @@ const generateKeyPathInfo = (data) => {
   const getPaths = generateFactory(generatePath);
   const userType = useUserType();
   const paths = getPaths(data)
-    .reduce((acc, cur) => [...acc, ...cur], [])
-    .map((item) => ['/dashboard', userType, item].filter((item) => !!item).join('/'));
+    ?.reduce((acc, cur) => [...acc, ...cur], [])
+    ?.map((item) => ['/dashboard', userType, item].filter((item) => !!item).join('/'));
   const getKeys = generateFactory(generateKey);
-  const keys = getKeys(data).reduce((acc, cur) => [...acc, ...cur], []);
+  const keys = getKeys(data)?.reduce((acc, cur) => [...acc, ...cur], []);
 
   return { keys, paths };
 };
@@ -60,9 +60,9 @@ export const getActiveKey = (data) => {
   const router = useRouter();
   const activeRoute = omitDetailedPath(router.pathname);
   const { paths, keys } = memoizedGenerateKeyPathInfo(data);
-  const index = paths.findIndex((item) => item === activeRoute);
+  const index = paths?.findIndex((item) => item === activeRoute);
 
-  return keys[index] || '';
+  return keys[index] ?? '';
 };
 
 export const getSideNavNameByKey = (key) => key.split('/').map((item) => item.split('-')[0]);
