@@ -76,7 +76,8 @@ export function makeServer({ environment = 'development' } = {}) {
         if (
           request.url === '/_next/static/development/_devPagesManifest.json' ||
           request.url.includes('mocky.io') ||
-          request.url.includes('highcharts')
+          request.url.includes('highcharts') ||
+          request.url.includes('cms.chtoma.com')
         )
           return true;
       });
@@ -252,7 +253,7 @@ export function makeServer({ environment = 'development' } = {}) {
           email,
           area,
           typeId: type,
-          ctime: format(new Date(), 'yyyy-MM-dd hh:mm:ss'),
+          createdAt: format(new Date(), 'yyyy-MM-dd hh:mm:ss'),
         });
 
         newStudent.attrs.typeName = newStudent.type.name;
@@ -525,7 +526,7 @@ export function makeServer({ environment = 'development' } = {}) {
           cover,
           teacherId,
           typeId,
-          ctime: format(new Date(), 'yyyy-MM-dd hh:mm:ss'),
+          createdAt: format(new Date(), 'yyyy-MM-dd hh:mm:ss'),
         });
 
         if (newCourse) {
@@ -631,7 +632,7 @@ export function makeServer({ environment = 'development' } = {}) {
           course: {
             total: courses.length,
             lastMonthAdded: schema.courses.where(
-              (item) => new Date(item.ctime) >= subMonths(new Date(), 1)
+              (item) => new Date(item.createdAt) >= subMonths(new Date(), 1)
             ).models.length,
           },
         };
@@ -653,7 +654,7 @@ export function makeServer({ environment = 'development' } = {}) {
               return acc;
             }, {})
           ),
-          ctime: getStatisticsDataHelper.getCourseCreatedTime(source),
+          createdAt: getStatisticsDataHelper.getCourseCreatedTime(source),
           interest: getStatisticsDataHelper.getList(
             source
               .map((item) => item.profile?.attrs?.interest ?? [])
@@ -698,7 +699,7 @@ export function makeServer({ environment = 'development' } = {}) {
 
             return workingYears;
           }),
-          ctime: getStatisticsDataHelper.getCourseCreatedTime(source),
+          createdAt: getStatisticsDataHelper.getCourseCreatedTime(source),
         };
 
         return new Response(200, {}, { msg: 'success', code: 200, data });
@@ -708,7 +709,7 @@ export function makeServer({ environment = 'development' } = {}) {
         const source = schema.courses.all().models;
         const data = {
           typeName: getStatisticsDataHelper.getList(countBy(source, (item) => item.type.name)),
-          ctime: getStatisticsDataHelper.getCourseCreatedTime(source),
+          createdAt: getStatisticsDataHelper.getCourseCreatedTime(source),
           classTime: Object.entries(
             groupBy(
               source.map((course) => {

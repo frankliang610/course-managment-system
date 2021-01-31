@@ -1,13 +1,36 @@
 import axios from 'axios';
 import { apiPathsGenerator } from './apiPathsGenerator';
 import formattedResponse from './formattedResponse';
+import { getToken } from '../utilities/loginUserInfo';
 
 const { formattedError } = formattedResponse;
 
+const getBaseUrl = () => {
+  if (process.env.MODE_ENV === 'development') {
+    return process.env.NEXT_PUBLIC_API || 'http://localhost:3001/api';
+  } else {
+    return 'https://cms.chtoma.com/api';
+  }
+};
+const baseURL = getBaseUrl();
 const axiosClient = axios.create({
+  baseURL,
   withCredentials: true,
-  baseURL: 'http://localhost:3000/api',
   responseType: 'json',
+});
+
+axiosClient.interceptors.request.use((config) => {
+  if (!config.url.includes('login')) {
+    return {
+      ...config,
+      headers: {
+        ...config.headers,
+        Authorization: 'Bearer ' + getToken(),
+      },
+    };
+  }
+
+  return config;
 });
 
 //* GET Method
@@ -16,7 +39,7 @@ const getRequest = async (path, params) => {
   const response = await axiosClient
     .get(url)
     .then((res) => res.data)
-    .catch((err) => formattedError(err.response));
+    .catch((err) => err);
 
   return response;
 };
@@ -27,7 +50,7 @@ const postRequest = async (path, data = null, params = null) => {
   const response = await axiosClient
     .post(url, data)
     .then((res) => res.data)
-    .catch((err) => formattedError(err.response));
+    .catch((err) => err);
 
   return response;
 };
