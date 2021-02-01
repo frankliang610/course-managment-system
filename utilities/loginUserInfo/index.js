@@ -19,9 +19,20 @@ export const getToken = () => {
 };
 
 export const getUserRole = () => {
+  const router = useRouter();
+  let role = '';
   const userInfo = getUserInfo();
-  const role = userInfo?.role;
+  role = userInfo?.role ?? role;
+  if (!role) {
+    role = router.pathname.split('/')[2];
+  }
   return role;
+};
+
+export const getUserId = () => {
+  const userInfo = getUserInfo();
+  const userId = userInfo?.userId;
+  return userId;
 };
 
 export const setUserInfo = (info) => {
