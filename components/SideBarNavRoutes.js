@@ -6,6 +6,7 @@ import {
   TeamOutlined,
   UserOutlined,
   SelectOutlined,
+  MessageOutlined,
 } from '@ant-design/icons';
 import { Role } from '../utilities/constant/role';
 
@@ -17,6 +18,7 @@ const routePath = {
   courses: 'courses',
   addCourse: 'addCourse',
   editCourse: 'editCourse',
+  message: 'message',
 };
 
 const overview = {
@@ -86,10 +88,16 @@ const courses = {
   ],
 };
 
+const messages = {
+  path: [routePath.message],
+  label: 'Message',
+  icon: <MessageOutlined />,
+};
+
 const routes = {
-  [Role.manager]: [overview, students, teachers, courses],
-  [Role.teacher]: [overview, students, courses],
-  [Role.student]: [overview, courses],
+  [Role.manager]: [overview, students, teachers, courses, messages],
+  [Role.teacher]: [overview, students, courses, messages],
+  [Role.student]: [overview, courses, messages],
 };
 
 export default routes;

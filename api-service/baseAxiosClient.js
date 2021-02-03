@@ -5,7 +5,7 @@ import { getToken } from '../utilities/loginUserInfo';
 
 const { formattedError } = formattedResponse;
 
-const getBaseUrl = () => {
+export const getBaseUrl = () => {
   if (process.env.MODE_ENV === 'development') {
     return process.env.NEXT_PUBLIC_API || 'http://localhost:3001/api';
   } else {
@@ -55,6 +55,17 @@ const postRequest = async (path, data = null, params = null) => {
   return response;
 };
 
+//* PUT Method
+const putRequest = async (path, data = null, params = null) => {
+  const url = apiPathsGenerator(path, params);
+  const response = await axiosClient
+    .put(url, data)
+    .then((res) => res.data)
+    .catch((err) => err);
+
+  return response;
+};
+
 //* DELETE Method
 const deleteRequest = async (path, params = null) => {
   const url = apiPathsGenerator(path, params);
@@ -69,5 +80,6 @@ const deleteRequest = async (path, params = null) => {
 export default {
   getRequest,
   postRequest,
+  putRequest,
   deleteRequest,
 };

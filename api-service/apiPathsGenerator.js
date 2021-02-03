@@ -35,6 +35,10 @@ export const apiPathsGenerator = (paths, params) => {
     if (typeof params === 'string') {
       generatedApiPath = paths + '/' + params;
     } else {
+      if (params.hasOwnProperty('type') && !params.type) {
+        delete params.type;
+      }
+
       queryParams = Object.entries(params)
         .map(([key, value]) => `${key}=${value}`)
         .join('&');

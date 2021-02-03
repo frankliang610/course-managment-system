@@ -1,10 +1,11 @@
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
-import { getUserInfo, getUserRole } from '../../utilities/loginUserInfo';
+import { getToken, getUserRole } from '../../utilities/loginUserInfo';
 
 export const useLoginUserState = () => {
   const router = useRouter();
-  const { role, token } = getUserInfo();
+  const role = getUserRole();
+  const token = getToken();
 
   useEffect(() => {
     if (!token) {
