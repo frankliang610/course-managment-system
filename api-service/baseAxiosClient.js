@@ -7,14 +7,17 @@ const { formattedError } = formattedResponse;
 
 export const getBaseUrl = () => {
   if (process.env.MODE_ENV === 'development') {
-    return process.env.NEXT_PUBLIC_API || 'http://localhost:3001/api';
+    return 'http://localhost:3001/api';
+    // return process.env.NEXT_PUBLIC_API || 'http://localhost:3001/api';
   } else {
-    return 'https://cms.chtoma.com/api';
+    return 'http://localhost:3001/api';
+    // return 'https://cms.chtoma.com/api';
   }
 };
 const baseURL = getBaseUrl();
 const axiosClient = axios.create({
   baseURL,
+  headers: { 'Access-Control-Allow-Origin': '*' },
   withCredentials: true,
   responseType: 'json',
 });

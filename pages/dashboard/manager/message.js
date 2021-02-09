@@ -13,17 +13,14 @@ import { getUserId } from '../../../utilities/loginUserInfo';
 
 const MessageContainer = styled.div`
   padding: 0 20px;
-  overflow-y: scroll;
-  max-height: 75vh;
+  height: 80vh;
 `;
 
 const Message = () => {
   const userId = getUserId();
   const { dispatch } = useMessages();
-  const [data, setData] = useState([]);
   const [type, setType] = useState('');
-  const [total, setTotal] = useState(0);
-  const [messages, setMessages] = useState([]);
+  const [data, setData] = useState([]);
   const [source, setSource] = useState({});
   const [dataSource, setDataSource] = useState([]);
   const [hasMore, setHasMore] = useState(true);
@@ -33,14 +30,14 @@ const Message = () => {
   });
 
   useEffect(() => {
-    messageEventApi.getMessages({ ...paginator, type, userId }).then((res) => {
+    const param = type ? { ...paginator, type, userId } : { ...paginator, userId };
+    messageEventApi.getMessages(param).then((res) => {
       const { data: fetchedData } = res;
-      const newData = fetchedData?.messages ?? [];
+      const newData = fetchedData?.messages;
       const totalData = [...data, ...newData];
 
-      setMessages(totalData);
-      setTotal(newData.total);
-      setHasMore(total > totalData.length);
+      setData(totalData);
+      setHasMore(fetchedData.total > totalData.length);
     });
   }, [paginator]);
 
@@ -52,7 +49,7 @@ const Message = () => {
   };
 
   useEffect(() => {
-    const result = messages.reduce((acc, cur) => {
+    const result = data.reduce((acc, cur) => {
       const key = format(new Date(cur.createdAt), 'yyyy-MM-dd');
 
       if (!acc[key]) {
@@ -70,7 +67,7 @@ const Message = () => {
 
     setSource({ ...result });
     setDataSource(flattenResult);
-  }, [messages]);
+  }, [data]);
 
   return (
     <Layout>
@@ -100,12 +97,13 @@ const Message = () => {
         <InfiniteScroll
           next={fetchMoreData}
           hasMore={hasMore}
+          scrollThreshold="500px"
           loader={
             <div style={{ textAlign: 'center' }}>
               <Spin size="default" />
             </div>
           }
-          dataLength={flatten(Object.values(source)).length}
+          dataLength={data.length}
           endMessage={<div style={{ textAlign: 'center' }}>No more messages!</div>}
           scrollableTarget="msg-container"
         >
@@ -118,9 +116,9 @@ const Message = () => {
                 <Space size="large">
                   <Typography.Title level={4}>{date}</Typography.Title>
                 </Space>
-                {values.map((item) => (
+                {values.map((item, index) => (
                   <List.Item
-                    key={item.createdAt}
+                    key={`${index}-${item.createdAt}`}
                     style={{ opacity: item.status ? 0.4 : 1 }}
                     actions={[<Space>{item.createdAt}</Space>]}
                     extra={

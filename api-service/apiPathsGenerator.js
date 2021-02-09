@@ -6,6 +6,7 @@ export const rootPaths = {
   course: 'course',
   courses: 'courses',
   statistics: 'statistics',
+  message: 'message',
 };
 
 export const subPaths = {
@@ -18,6 +19,7 @@ export const subPaths = {
   courseTeachers: 'course-teachers',
   courseProcess: 'schedule',
   overview: 'overview',
+  statistics: 'statistics',
 };
 
 export const statisticsType = {

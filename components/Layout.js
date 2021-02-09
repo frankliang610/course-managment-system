@@ -14,6 +14,7 @@ import {
   List,
   Space,
   Avatar,
+  message,
 } from 'antd';
 import {
   MenuUnfoldOutlined,
@@ -124,7 +125,6 @@ const Footer = styled(Row)`
 
 const Messages = (props) => {
   const { type } = props;
-  const [total, setTotal] = useState(0);
   const [data, setData] = useState([]);
   const [hasMore, setHasMore] = useState(true);
   const [paginator, setPaginator] = useState({
@@ -133,14 +133,14 @@ const Messages = (props) => {
   });
 
   useEffect(() => {
-    messageEventApi.getMessages({ ...paginator, type }).then((res) => {
+    const param = type ? { ...paginator, type } : { ...paginator };
+    messageEventApi.getMessages(param).then((res) => {
       const { data: fetchedData } = res;
       const newData = fetchedData?.messages;
       const totalData = [...data, ...newData];
 
       setData(totalData);
-      setTotal(newData.total);
-      setHasMore(total > totalData.length);
+      setHasMore(fetchedData.total > totalData.length);
     });
   }, [paginator]);
 
@@ -156,7 +156,7 @@ const Messages = (props) => {
       const ids = data.filter((item) => item.status === 0).map((item) => item.id);
 
       if (ids.length) {
-        apiService.markAsRead(ids).then((res) => {
+        messageEventApi.markAsRead(ids).then((res) => {
           if (res.data) {
             setData(data.map((item) => ({ ...item, status: 1 })));
           }
@@ -233,6 +233,7 @@ const Messages = (props) => {
 
 const MessageBadge = () => {
   const role = getUserRole();
+  const userId = getUserId();
   const types = ['notification', 'message'];
   const [activeType, setActiveType] = useState('notification');
   const { messagesState, dispatch } = useMessages();
@@ -243,9 +244,8 @@ const MessageBadge = () => {
   });
 
   useEffect(() => {
-    messageEventApi.getMessageStatistics().then((res) => {
+    messageEventApi.getMessageStatistics(userId).then((res) => {
       const { data } = res;
-
       if (data) {
         const {
           receive: { notification, message },
@@ -417,13 +417,12 @@ const CustomisedLayout = ({ children }) => {
             {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
           </StyledIcon>
 
-          <Row align="middle">
+          <Row align="middle" justify="end" gutter>
             <MessageBadge />
+            <StyledIcon onClick={logOut}>
+              <PoweroffOutlined />
+            </StyledIcon>
           </Row>
-
-          <StyledIcon onClick={logOut}>
-            <PoweroffOutlined />
-          </StyledIcon>
         </StyledContentHeader>
         <CustomizedBreadcrumb />
         <StyledContent>{children}</StyledContent>

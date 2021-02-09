@@ -5,7 +5,7 @@ const { Header, Content } = Layout;
 const { Title } = Typography;
 
 export const StyledLayout = styled(Layout)`
-  height: 100vh;
+  height: 97vh;
 `;
 
 export const StyledContentLayout = styled(Layout)`
