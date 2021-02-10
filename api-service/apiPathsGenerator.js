@@ -7,6 +7,7 @@ export const rootPaths = {
   courses: 'courses',
   statistics: 'statistics',
   message: 'message',
+  class: 'class',
 };
 
 export const subPaths = {
@@ -20,6 +21,7 @@ export const subPaths = {
   courseProcess: 'schedule',
   overview: 'overview',
   statistics: 'statistics',
+  schedule: 'schedule',
 };
 
 export const statisticsType = {
@@ -49,6 +51,6 @@ export const apiPathsGenerator = (paths, params) => {
   } else {
     generatedApiPath = paths;
   }
-
+  console.log('generatedApiPath :>> ', generatedApiPath);
   return generatedApiPath;
 };

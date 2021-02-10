@@ -9,7 +9,8 @@ export const useLoginUserState = () => {
 
   useEffect(() => {
     if (!token) {
-      router.push('/login', undefined, { shallow: true });
+      router.push('/', undefined, { shallow: true });
+      // router.push('/login', undefined, { shallow: true });
     }
 
     if (role) {

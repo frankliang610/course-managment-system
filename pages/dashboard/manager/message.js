@@ -3,7 +3,6 @@ import { AlertOutlined, MessageOutlined, UserOutlined } from '@ant-design/icons'
 import { Avatar, Col, List, Row, Select, Space, Spin, Typography } from 'antd';
 import styled from 'styled-components';
 import { format } from 'date-fns';
-import { flatten } from 'lodash';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import Layout from '../../../components/Layout';
 import { useMessages } from '../../../components/store/messageStore';
