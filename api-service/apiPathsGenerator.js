@@ -51,6 +51,6 @@ export const apiPathsGenerator = (paths, params) => {
   } else {
     generatedApiPath = paths;
   }
-  console.log('generatedApiPath :>> ', generatedApiPath);
+
   return generatedApiPath;
 };
